@@ -8,6 +8,7 @@
     #include "Tile.hpp"
     #include "IObject.hpp"
     #include "ILight.hpp"
+    #include "Scene.hpp"
 
 namespace raytracer {
 
@@ -24,7 +25,7 @@ public:
     ~IManager() = default;
 
     virtual void InitCore(Core& core) = 0;
-    virtual void Update(const std::vector<std::unique_ptr<IObject>>& objects, const std::vector<std::unique_ptr<ILight>>& lights, const render::Camera& camera, std::vector<std::vector<Tile>>& map) = 0;
+    virtual void Update(Scene& scene, const std::array<int, 3> BgCollor) = 0;
     virtual State GetState(void) = 0;
 };
 

@@ -7,9 +7,13 @@ SfmlDisplay::SfmlDisplay(std::size_t width, std::size_t height)
     , _pixels(width * height * 4, 0) {
     if (width == 0 || height == 0)
         throw std::runtime_error("Cannot create display with empty dimensions");
-    if (!_texture.create(static_cast<unsigned int>(width), static_cast<unsigned int>(height)))
-        throw std::runtime_error("Cannot create SFML texture");
-    _sprite.setTexture(_texture, true);
+
+    uint32_t sceen_x = width < 800 ? width : 800;
+    uint32_t sreen_y = height < 600 ? height : 600;
+
+    if (!_screen.create(static_cast<unsigned int>(sceen_x), static_cast<unsigned int>(sreen_y)))
+            throw std::runtime_error("Cannot create SFML texture");
+        _sprite.setTexture(_screen, true);
     _window.setFramerateLimit(60);
 }
 
@@ -51,7 +55,7 @@ void SfmlDisplay::render(const std::vector<std::vector<Tile>>& map) {
         return;
 
     rebuildPixels(map);
-    _texture.update(_pixels.data());
+    _screen.update(_pixels.data());
 
     _window.clear();
     _window.draw(_sprite);

@@ -18,8 +18,8 @@ class CfgReader : public AReader {
     void TakeOneValue(const libconfig::Setting& cfg, std::map<std::string, std::string>& params, const std::string& prefix);
 
     template<typename T>
-    std::vector<std::unique_ptr<T>> loadSubList(const std::string& section, const std::string& name_list) {
-        std::vector<std::unique_ptr<T>> list;
+    std::vector<std::shared_ptr<T>> loadSubList(const std::string& section, const std::string& name_list) {
+        std::vector<std::shared_ptr<T>> list;
         const libconfig::Setting& root = _cfg.getRoot();
         if (!root.exists(section))
             return list;
@@ -41,8 +41,8 @@ class CfgReader : public AReader {
     }
 
     template<typename T>
-    std::vector<std::unique_ptr<T>> loadLists(std::string name_list) {
-        std::vector<std::unique_ptr<T>> list;
+    std::vector<std::shared_ptr<T>> loadLists(std::string name_list) {
+        std::vector<std::shared_ptr<T>> list;
         const libconfig::Setting& root = _cfg.getRoot();
         if (!root.exists(name_list))
             throw Warning("Reader: No Objets found.");
@@ -120,8 +120,8 @@ public:
     std::array<int, 3> GetCameraRotation();
     double GetCameraFieldOfView();
 
-    std::vector<std::unique_ptr<IObject>> GetObjects() { return loadLists<IObject>("primitives"); };
-    std::vector<std::unique_ptr<ILight>> GetLights();
+    std::vector<std::shared_ptr<IObject>> GetObjects() { return loadLists<IObject>("primitives"); };
+    std::vector<std::shared_ptr<ILight>> GetLights();
 };
 
 }

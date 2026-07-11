@@ -16,7 +16,7 @@ public:
     ~AManager() = default;
 
     void InitCore(Core& core) {(void)core; std::cout << "nn" << std::endl;};
-    void Update(const std::vector<std::unique_ptr<IObject>>& objects, const std::vector<std::unique_ptr<ILight>>& lights, const render::Camera& camera, std::vector<std::vector<Tile>>& map) = 0;
+    void Update(Scene& scene, const std::array<int, 3> BgCollor) = 0;
     State GetState(void) {return _state;};
 };
 

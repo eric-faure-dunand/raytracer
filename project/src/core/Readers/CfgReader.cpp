@@ -72,8 +72,8 @@ double CfgReader::GetCameraFieldOfView() {
     return fov;
 }
 
-std::vector<std::unique_ptr<ILight>> CfgReader::GetLights() {
-    std::vector<std::unique_ptr<ILight>> lights;
+std::vector<std::shared_ptr<ILight>> CfgReader::GetLights() {
+    std::vector<std::shared_ptr<ILight>> lights;
 
     const std::vector<std::string> lightTypes = {"ambient", "directional", "point"};
 

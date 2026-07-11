@@ -12,7 +12,7 @@ namespace raytracer {
 
 class SfmlDisplay {
     sf::RenderWindow _window;
-    sf::Texture _texture;
+    sf::Texture _screen;
     sf::Sprite _sprite;
     std::vector<sf::Uint8> _pixels;
     void rebuildPixels(const std::vector<std::vector<Tile>>& map);

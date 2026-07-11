@@ -3,9 +3,9 @@
 
 namespace raytracer {
 
-void DefaultManager::Update(const std::vector<std::unique_ptr<IObject>>& objects, const std::vector<std::unique_ptr<ILight>>& lights, const render::Camera& camera, std::vector<std::vector<Tile>>& map) {
+void DefaultManager::Update(Scene& scene, const std::array<int, 3> BgCollor) {
     _state = WORKING;
-    if (CalculatedRow >= map.size()) {
+    if (CalculatedRow >= scene._screen.size()) {
         _state = FINISH;
         return;
     }
@@ -17,15 +17,15 @@ void DefaultManager::Update(const std::vector<std::unique_ptr<IObject>>& objects
                 _Printer.ClearNbLine(1);
         }
         int nb = _multiThread.GetTreadNumber();
-        int end = CalculatedRow + nb > map.size() ? map.size() : CalculatedRow + nb;
-        _multiThread.Compute(objects, lights, camera, map, CalculatedRow, end, CalculingRow);
+        int end = CalculatedRow + nb > scene._screen.size() ? scene._screen.size() : CalculatedRow + nb;
+        _multiThread.Compute(scene, BgCollor, CalculatedRow, end, CalculingRow);
         CalculatedRow = end;
-        _Printer.PrintLine(std::to_string((CalculingRow * 100) / map.size()) + "% Calculated.");
+        _Printer.PrintLine(std::to_string((CalculingRow * 100) / scene._screen.size()) + "% Calculated.");
     } else {
         _Printer.ClearNbLine(1);
-        _Printer.PrintLine(std::to_string((CalculingRow * 100) / map.size()) + "% Calculated.");
+        _Printer.PrintLine(std::to_string((CalculingRow * 100) / scene._screen.size()) + "% Calculated.");
     }
-    if (CalculingRow >= map.size() - 1) {
+    if (CalculingRow >= scene._screen.size() - 1) {
         _state = FINISH;
         return;
     }
