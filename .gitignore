@@ -1,0 +1,9 @@
+build/
+raytracer
+*.cfg
+*.ppm
+.vscode
+bootsrap
+cim59vrioikg-IndoorPotPlant
+*.so
+*.obj
