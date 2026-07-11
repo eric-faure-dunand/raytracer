@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** Core.hpp
-*/
 
 #ifndef CORE_HPP
     #define CORE_HPP

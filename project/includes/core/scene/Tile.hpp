@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** Tile.hpp
-*/
 
 #ifndef TILE_HPP
     #define TILE_HPP

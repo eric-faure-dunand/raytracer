@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** ServerManager.hpp
-*/
 
 #ifndef SERVERMANAGER_HPP
     #define SERVERMANAGER_HPP

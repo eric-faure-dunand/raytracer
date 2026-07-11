@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** ClientManager.hpp
-*/
 
 #ifndef CLIENTMANAGER_HPP
     #define CLIENTMANAGER_HPP

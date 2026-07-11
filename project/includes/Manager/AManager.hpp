@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** AManager.hpp
-*/
 
 #ifndef AMANAGER_HPP
     #define AMANAGER_HPP

@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer²
-** File description:
-** ServerManager.cpp
-*/
 
 #include "ServerManager.hpp"
 

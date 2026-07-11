@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** Nano
-** File description:
-** FileNotFound.hpp
-*/
 
 #ifndef FILE_NOT_FOUND_HPP
     #define FILE_NOT_FOUND_HPP

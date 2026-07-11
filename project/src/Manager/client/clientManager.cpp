@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** clientManager.cpp
-*/
 
 #include "ClientManager.hpp"
 #include "CfgReader.hpp"

@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** Nano
-** File description:
-** Warning.hpp
-*/
 
 #ifndef WARNING_HPP
     #define WARNING_HPP

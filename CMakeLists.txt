@@ -24,6 +24,7 @@ target_include_directories(raytracer
         project/includes/Display/printer
         project/includes/Threading
         project/includes/core
+        project/includes/core/scene
         project/includes/core/ToFile
         project/includes/core/reader
         project/includes/core/reader/cfgReader
