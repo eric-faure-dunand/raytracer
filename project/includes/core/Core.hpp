@@ -1,24 +1,17 @@
 
 #ifndef CORE_HPP
     #define CORE_HPP
-    #include <cstddef>
+    #include <array>
     #include <memory>
     #include <string>
-    #include <utility>
     #include <vector>
-    #include <libconfig.h++>
-    #include <optional>
 
     #include "IManager.hpp"
-    #include "Error.hpp"
-    #include "Warning.hpp"
     #include "IReader.hpp"
     #include "IObject.hpp"
     #include "ILight.hpp"
     #include "Camera.hpp"
-    #include "ppm.hpp"
-    #include "SfmlDisplay.hpp"
-
+    #include "Display.hpp"
     #include "Scene.hpp"
 
 namespace raytracer {
@@ -33,11 +26,10 @@ class Core {
     std::string _sceneFile;
     std::array<int, 3> _backgroundColor = {255, 0, 255};
 
-    ToPpm ppmconvertor;
-    std::optional<SfmlDisplay> sfml;
+    std::vector<std::unique_ptr<IObject>> objects;
+    std::vector<std::unique_ptr<ILight>> lights;
 
     Scene _scene;
-    std::vector<Scene> _subScene;
 
 public:
 
