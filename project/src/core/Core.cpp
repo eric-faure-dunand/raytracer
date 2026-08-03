@@ -1,11 +1,16 @@
 
 #include "Core.hpp"
 
+#include <iostream>
+
+#include "Error.hpp"
+#include "Warning.hpp"
+#include "printer.hpp"
+
 namespace raytracer {
 
 Core::Core(std::unique_ptr<IReader> reader, std::unique_ptr<IManager> manager, const std::string& sceneFile, bool NoInit)
     : _manager(std::move(manager)), _reader(std::move(reader)), _sceneFile(sceneFile) {
-    sfml.emplace(900, 900);
     _init = NoInit ? false : true;
     if (NoInit)
         return;
@@ -23,13 +28,13 @@ void Core::Init() {
             _reader->GetCameraRotation(),
             size,
             _reader->GetCameraFieldOfView()));
-    }
-    try {
-        builder.add_objects(_reader->GetObjects());
-        builder.add_lights(_reader->GetLights());
-    } catch (const IError& e) {
-        if (e.code() == 84)
-            throw Error("Core : " + static_cast<std::string>(e.what()));
+        try {
+            objects = _reader->GetObjects();
+            lights = _reader->GetLights();
+        } catch (const IError& e) {
+            if (e.code() == 84)
+                throw Error("Core : " + static_cast<std::string>(e.what()));
+        }
     }
     _scene = builder.BuildScene();
 }
@@ -45,13 +50,13 @@ IReader& Core::GetReader() {
 }
 
 void Core::ReloadObjectsAndLights() {
-    _scene._objects.clear();
-    _scene._lights.clear();
+    objects.clear();
+    lights.clear();
     if (!_reader)
         return;
     try {
-        _scene._objects = _reader->GetObjects();
-        _scene._lights = _reader->GetLights();
+        objects = _reader->GetObjects();
+        lights = _reader->GetLights();
     } catch (const IError& e) {
         if (e.code() == 84)
             throw Error("Core : " + static_cast<std::string>(e.what()));
@@ -67,16 +72,12 @@ void Core::Run() {
         _manager->InitCore(*this);
     std::cout << Color::CYAN << "Core ready." << Color::RESET << std::endl;
 
-    //time_t time = std::time(NULL);
-
-    while (sfml->isOpen()) {
-        if (!sfml->pollEvents())
-            break;
-        _manager->Update(_scene, _backgroundColor);
-        sfml->render(_scene._screen);
+    Display display(1280, 720, "Raytracer");
+    while (display.isOpen()) {
+        display.beginFrame();
+        display.drawEditor();
+        display.endFrame();
     }
-    if (!_sceneFile.empty())
-        ppmconvertor.Draw(_sceneFile.substr(0, _sceneFile.rfind('.')) + ".ppm", _scene._screen);
 }
 
 }
