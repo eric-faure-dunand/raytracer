@@ -1,50 +1,83 @@
-cmake_minimum_required(VERSION 3.10)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/plugins)
+cmake_minimum_required(VERSION 3.16)
+project(raytracer CXX C)
 
-project(raytracer CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+# ---------------------------------------------------------------------------
+# Dependencies
+# ---------------------------------------------------------------------------
+include(FetchContent)
+
+find_package(OpenGL REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBCONFIG REQUIRED libconfig++)
-pkg_check_modules(SFML QUIET sfml-graphics sfml-window sfml-system)
-if(NOT SFML_FOUND)
-    find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
-endif()
 
-file(GLOB_RECURSE PROJECT_SRCS
-    ${CMAKE_SOURCE_DIR}/project/src/*.cpp
+# GLFW : built from source, cross-platform (Win32 / X11 / Wayland).
+set(GLFW_BUILD_DOCS     OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG        3.4
+)
+FetchContent_MakeAvailable(glfw)
+
+# glad : vendored, pre-generated GL core 4.3 loader (no tooling needed).
+add_library(glad STATIC vendor/glad/src/gl.c)
+target_include_directories(glad PUBLIC vendor/glad/include)
+
+# Dear ImGui : vendored core + glfw/opengl3 backends (docking branch).
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/vendor/imgui)
+add_library(imgui STATIC
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+)
+target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${IMGUI_DIR}/backends)
+target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
+
+# ---------------------------------------------------------------------------
+# Application
+# ---------------------------------------------------------------------------
+file(GLOB_RECURSE PROJECT_SRCS ${CMAKE_SOURCE_DIR}/project/src/*.cpp)
+# Dead CPU-render / networking (removed for now, GPU replaces the renderer).
+list(REMOVE_ITEM PROJECT_SRCS
+    ${CMAKE_SOURCE_DIR}/project/src/Threading/MultiThreading.cpp
+    ${CMAKE_SOURCE_DIR}/project/src/Manager/Net.cpp
 )
 
 add_executable(raytracer ${PROJECT_SRCS})
 
 target_include_directories(raytracer
-    PUBLIC
+    PRIVATE
         project/includes
         project/includes/Display
-        project/includes/Display/printer
         project/includes/Threading
         project/includes/core
         project/includes/core/scene
         project/includes/core/ToFile
         project/includes/core/reader
         project/includes/core/reader/cfgReader
-        project/includes/core/reader/libld
+        project/includes/core/reader/libld  
         project/includes/Manager
-        project/includes/math
-        project/includes/render
         project/includes/Manager/default
         project/includes/Manager/client
         project/includes/Manager/server
+        project/includes/render
         project/includes/security
-        project/includes/Error
-        project/includes/Lights
         ${LIBCONFIG_INCLUDE_DIRS}
-        ${SFML_INCLUDE_DIRS}
         shared
-        shared/LIght
+        shared/Light
         shared/Object
         shared/Texture
-        shared/math
         shared/Error
         shared/printer
 )
@@ -58,55 +91,9 @@ target_compile_options(raytracer
 
 target_link_libraries(raytracer
     PRIVATE
+        glfw
+        glad
+        imgui
+        OpenGL::GL
         ${LIBCONFIG_LIBRARIES}
-    sfml-graphics
-    sfml-window
-    sfml-system
 )
-
-# Plugin compilation system
-# Automatically compile all plugins from the plugins/ directory
-# Each plugin directory should contain:
-#   - One or more .cpp files implementing the plugin
-#   - Optionally, custom includes (will use shared/ headers)
-# Output: raytracer_<plugin_name>.so in the plugins/ directory
-
-
-file(GLOB PLUGIN_DIRS "${CMAKE_SOURCE_DIR}/plugins/*")
-foreach(PLUGIN_DIR ${PLUGIN_DIRS})
-    if(IS_DIRECTORY "${PLUGIN_DIR}")
-        get_filename_component(PLUGIN_NAME ${PLUGIN_DIR} NAME)
-        file(GLOB_RECURSE PLUGIN_SRCS "${PLUGIN_DIR}/*.cpp")
-        if(PLUGIN_SRCS)
-            add_library(raytracer_${PLUGIN_NAME} SHARED ${PLUGIN_SRCS})
-            set(PLUGIN_OUTPUT_NAME ${PLUGIN_NAME})
-            if(PLUGIN_NAME STREQUAL "spheres")
-                set(PLUGIN_OUTPUT_NAME "sphere")
-            elseif(PLUGIN_NAME STREQUAL "planes")
-                set(PLUGIN_OUTPUT_NAME "plane")
-            elseif(PLUGIN_NAME STREQUAL "triangles")
-                set(PLUGIN_OUTPUT_NAME "triangle")
-            elseif(PLUGIN_NAME STREQUAL "cylinders")
-                set(PLUGIN_OUTPUT_NAME "cylinder")
-            endif()
-            set_target_properties(raytracer_${PLUGIN_NAME} PROPERTIES PREFIX "" OUTPUT_NAME "raytracer_${PLUGIN_OUTPUT_NAME}")
-            target_include_directories(raytracer_${PLUGIN_NAME}
-                PUBLIC
-                    shared
-                    shared/LIght
-                    shared/Object
-                    shared/Texture
-                    shared/math
-                    shared/Error
-                    shared/printer
-            )
-            target_compile_options(raytracer_${PLUGIN_NAME}
-                PRIVATE
-                    -Wall
-                    -Wextra
-                    -Werror
-            )
-            message(STATUS "Building plugin: raytracer_${PLUGIN_NAME}.so")
-        endif()
-    endif()
-endforeach()
