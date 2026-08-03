@@ -1,5 +1,5 @@
 
-#ifndef CLIENTMANAGER_HPP
+/*#ifndef CLIENTMANAGER_HPP
     #define CLIENTMANAGER_HPP
     #include <cstdint>
     #include <memory>
@@ -72,4 +72,4 @@ public:
 
 }
 
-#endif
+#endif*/

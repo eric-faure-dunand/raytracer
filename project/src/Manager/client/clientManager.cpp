@@ -1,5 +1,5 @@
 
-#include "ClientManager.hpp"
+/*#include "ClientManager.hpp"
 #include "CfgReader.hpp"
 
 #include <arpa/inet.h>
@@ -286,4 +286,4 @@ void ClientManager::InitCore(Core& core) {
     ProcessActiveStates(core);
 }
 
-}
+}*/

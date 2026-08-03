@@ -1,5 +1,5 @@
 
-#ifndef SERVERMANAGER_HPP
+/*#ifndef SERVERMANAGER_HPP
     #define SERVERMANAGER_HPP
     #include <cstdint>
     #include <sstream>
@@ -65,4 +65,4 @@ public:
 
 }
 
-#endif
+#endif*/

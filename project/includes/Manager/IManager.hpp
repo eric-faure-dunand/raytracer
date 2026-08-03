@@ -1,14 +1,6 @@
 
 #ifndef IMANAGER_HPP
     #define IMANAGER_HPP
-    #include <vector>
-
-    #include "Core.hpp"
-    #include "Camera.hpp"
-    #include "Tile.hpp"
-    #include "IObject.hpp"
-    #include "ILight.hpp"
-    #include "Scene.hpp"
 
 namespace raytracer {
 
@@ -20,12 +12,15 @@ typedef enum {
 } State;
 
 class Core;
+
+// Selecteur de mode (local / serveur / client). Le rendu CPU historique
+// (Update qui calculait des rangees de pixels) a ete retire : le rendu passe
+// sur GPU. Cette interface sera reetendue quand on branchera le multi.
 class IManager {
 public:
-    ~IManager() = default;
+    virtual ~IManager() = default;
 
     virtual void InitCore(Core& core) = 0;
-    virtual void Update(Scene& scene, const std::array<int, 3> BgCollor) = 0;
     virtual State GetState(void) = 0;
 };
 
