@@ -25,10 +25,10 @@ CoreBuilder& CoreBuilder::SetPort(std::uint16_t port) {
 }
 
 std::unique_ptr<IManager> CoreBuilder::BuildManager() const {
-    if (_mode == SERVER)
+    /*if (_mode == SERVER)
         return std::make_unique<ServerManager>(static_cast<int>(_port), _sceneFile);
     if (_mode == CLIENT)
-        return std::make_unique<ClientManager>(_ip, _port);
+        return std::make_unique<ClientManager>(_ip, _port);*/
     return std::make_unique<DefaultManager>();
 }
 
