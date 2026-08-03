@@ -3,8 +3,8 @@
 
 namespace raytracer {
 
-static void placeolder(const std::vector<std::shared_ptr<IObject>>& objects,
-    const std::vector<std::shared_ptr<ILight>>& lights,
+static void placeolder(const std::vector<std::unique_ptr<IObject>>& objects,
+    const std::vector<std::unique_ptr<ILight>>& lights,
     const render::Camera& camera,
     Tile& tile,
     size_t i,
@@ -30,6 +30,8 @@ bool MultiThread::isEnd(void) {
 
 int MultiThread::Compute(
     Scene& scene,
+    const std::vector<std::unique_ptr<IObject>>& objects,
+    const std::vector<std::unique_ptr<ILight>>& lights,
     const std::array<int, 3> BgColor,
     std::size_t start,
     std::size_t max,
@@ -44,10 +46,10 @@ int MultiThread::Compute(
     const std::size_t pixelWidth = scene._screen[0].size();
 
     for (std::size_t y = start; y < max; y++) {
-        thread.push_back(std::async(std::launch::async, [&scene, y, &CalculingRow, pixelWidth, BgColor]() {
+        thread.push_back(std::async(std::launch::async, [&scene, &objects, &lights, y, &CalculingRow, pixelWidth, BgColor]() {
             for (std::size_t i = 0; i < scene._screen[y].size(); ++i) {
                 Tile& tile = scene._screen[y][i];
-                placeolder(scene._objects, scene._lights, scene._camera, tile, i, y, pixelWidth, BgColor);
+                placeolder(objects, lights, scene._camera, tile, i, y, pixelWidth, BgColor);
             }
             CalculingRow++;
         }));
