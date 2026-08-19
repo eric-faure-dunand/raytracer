@@ -2,14 +2,22 @@
 #ifndef DISPLAY_HPP
     #define DISPLAY_HPP
 
+    #include <glad/gl.h>
+    #include <GLFW/glfw3.h>
+
+    #include "imgui.h"
+    #include "imgui_internal.h" // DockBuilder*
+    #include "backends/imgui_impl_glfw.h"
+    #include "backends/imgui_impl_opengl3.h"
+
+    #include "Error.hpp"
+
+    #include <cstdio>
+
 struct GLFWwindow;
 
 namespace raytracer {
 
-// Fenetre + contexte OpenGL 4.3 + Dear ImGui (docking).
-// Remplace l'ancien SfmlDisplay. Possede par le Core, pilote la boucle
-// editeur. Le rendu du raytracer (texture GPU) viendra s'afficher dans le
-// panneau Viewport.
 class Display {
     GLFWwindow *_window = nullptr;
 
@@ -22,7 +30,6 @@ public:
 
     bool isOpen() const;
 
-    // Un cycle de frame : begin (events + dockspace), draw (panneaux), end (rendu + swap).
     void beginFrame();
     void drawEditor();
     void endFrame();

@@ -1,17 +1,5 @@
 #include "Display.hpp"
 
-#include <glad/gl.h>
-#include <GLFW/glfw3.h>
-
-#include "imgui.h"
-#include "imgui_internal.h" // DockBuilder*
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
-
-#include "Error.hpp"
-
-#include <cstdio>
-
 namespace raytracer {
 
 static void glfw_error_callback(int error, const char *description)
@@ -19,8 +7,6 @@ static void glfw_error_callback(int error, const char *description)
     std::fprintf(stderr, "GLFW error %d: %s\n", error, description);
 }
 
-// Fenetre hote plein ecran qui contient le DockSpace, + layout par defaut
-// construit une seule fois.
 static void draw_dockspace()
 {
     const ImGuiViewport *vp = ImGui::GetMainViewport();
@@ -55,10 +41,10 @@ static void draw_dockspace()
         ImGuiID left   = ImGui::DockBuilderSplitNode(center, ImGuiDir_Left,  0.22f, nullptr, &center);
         ImGuiID center_bottom = ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.28f, nullptr, &center);
 
-        ImGui::DockBuilderDockWindow("Viewport",   center);        // haut-centre
-        ImGui::DockBuilderDockWindow("Hierarchy",  center_bottom); // sous le viewport
-        ImGui::DockBuilderDockWindow("Add Object", left);          // colonne gauche
-        ImGui::DockBuilderDockWindow("Inspector",  right);         // colonne droite
+        ImGui::DockBuilderDockWindow("Viewport",   center);
+        ImGui::DockBuilderDockWindow("Hierarchy",  center_bottom);
+        ImGui::DockBuilderDockWindow("Add Object", left);
+        ImGui::DockBuilderDockWindow("Inspector",  right);
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
@@ -67,25 +53,22 @@ static void draw_dockspace()
 
 static void draw_panels()
 {
-    // Viewport : accueillera l'image rendue par le compute shader.
     ImGui::Begin("Viewport");
-    ImGui::TextUnformatted("Simulation (placeholder)");
-    ImGui::TextDisabled("La sortie du raytracer viendra ici.");
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    std::string format = "available size = " + std::to_string(avail.x) + " " + std::to_string(avail.y);
+    ImGui::TextUnformatted(format.c_str());
     ImGui::End();
 
-    // Hierarchy : liste des objets presents dans la scene.
     ImGui::Begin("Hierarchy");
     ImGui::TextDisabled("Objets de la scene (vide)");
     ImGui::End();
 
-    // Add Object : liste des objets ajoutables.
     ImGui::Begin("Add Object");
     ImGui::Button("Sphere");
     ImGui::Button("Plane");
     ImGui::Button("Triangle");
     ImGui::End();
 
-    // Inspector : parametres de l'objet selectionne, sinon du fond de scene.
     ImGui::Begin("Inspector");
     ImGui::TextDisabled("Aucun objet selectionne");
     ImGui::TextUnformatted("Fond de la scene (placeholder)");
@@ -163,7 +146,7 @@ void Display::endFrame()
     int h = 0;
     glfwGetFramebufferSize(_window, &w, &h);
     glViewport(0, 0, w, h);
-    glClearColor(0.10f, 0.10f, 0.12f, 1.0f);
+    glClearColor(0.90f, 0.90f, 0.92f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(_window);

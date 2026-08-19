@@ -66,7 +66,7 @@ target_include_directories(raytracer
         project/includes/core/ToFile
         project/includes/core/reader
         project/includes/core/reader/cfgReader
-        project/includes/core/reader/libld  
+        project/includes/core/reader/libld
         project/includes/Manager
         project/includes/Manager/default
         project/includes/Manager/client
