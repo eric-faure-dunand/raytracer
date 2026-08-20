@@ -1,4 +1,7 @@
 #include "Display.hpp"
+#include "Renderer.hpp"
+
+#include <string>
 
 namespace raytracer {
 
@@ -51,12 +54,22 @@ static void draw_dockspace()
     ImGui::End();
 }
 
-static void draw_panels()
+static void draw_panels(Renderer &renderer)
 {
+    // Viewport : on rend la simulation a la taille exacte du panneau, puis on
+    // affiche la texture produite par le GPU.
     ImGui::Begin("Viewport");
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    std::string format = "available size = " + std::to_string(avail.x) + " " + std::to_string(avail.y);
-    ImGui::TextUnformatted(format.c_str());
+    int w = static_cast<int>(avail.x);
+    int h = static_cast<int>(avail.y);
+    if (w > 0 && h > 0) {
+        renderer.resize(w, h);
+        renderer.render();
+        // La texture GL a son origine en bas a gauche, ImGui dessine de haut
+        // en bas : on retourne verticalement via uv0=(0,1) / uv1=(1,0).
+        ImGui::Image(static_cast<ImTextureID>(renderer.texture()), avail,
+                     ImVec2(0, 1), ImVec2(1, 0));
+    }
     ImGui::End();
 
     ImGui::Begin("Hierarchy");
@@ -78,6 +91,12 @@ static void draw_panels()
 Display::Display(int width, int height, const char *title)
 {
     glfwSetErrorCallback(glfw_error_callback);
+#ifdef __linux__
+    // Sous WSLg, le backend Wayland gere mal le maximize (surface GL qui ne
+    // grandit pas d'un coup -> contour noir). X11 (XWayland) le gere bien.
+    // Ignore sur Windows/macOS. A reevaluer pour un Linux Wayland natif.
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+#endif
     if (!glfwInit())
         throw Error("Display: glfwInit failed");
 
@@ -108,10 +127,17 @@ Display::Display(int width, int height, const char *title)
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(_window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
+
+    // Le contexte GL est pret : on peut creer le renderer (il compile son shader).
+    _renderer = std::make_unique<Renderer>();
 }
 
 Display::~Display()
 {
+    // Detruire les objets GPU TANT QUE le contexte GL est encore vivant.
+    // (Sinon ~Renderer ferait des appels GL apres glfwTerminate -> segfault.)
+    _renderer.reset();
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -136,7 +162,7 @@ void Display::beginFrame()
 
 void Display::drawEditor()
 {
-    draw_panels();
+    draw_panels(*_renderer);
 }
 
 void Display::endFrame()

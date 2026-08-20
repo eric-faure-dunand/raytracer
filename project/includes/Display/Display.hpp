@@ -13,13 +13,17 @@
     #include "Error.hpp"
 
     #include <cstdio>
+    #include <memory>
 
 struct GLFWwindow;
 
 namespace raytracer {
 
+class Renderer;
+
 class Display {
     GLFWwindow *_window = nullptr;
+    std::unique_ptr<Renderer> _renderer;
 
 public:
     Display(int width, int height, const char *title);
