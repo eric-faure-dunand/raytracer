@@ -5,6 +5,7 @@
     #include <memory>
     #include <string>
     #include <vector>
+    #include <chrono>
 
     #include "IManager.hpp"
     #include "IReader.hpp"
@@ -20,6 +21,8 @@ class IManager;
 
 class Core {
     bool _init;
+
+    uint8_t _fps = 60;
 
     std::unique_ptr<IManager> _manager;
     std::unique_ptr<IReader> _reader;

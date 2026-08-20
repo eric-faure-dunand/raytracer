@@ -1,7 +1,8 @@
 
 #ifndef DISPLAY_HPP
     #define DISPLAY_HPP
-
+    #include <cstdio>
+    #include <memory>
     #include <glad/gl.h>
     #include <GLFW/glfw3.h>
 
@@ -11,9 +12,6 @@
     #include "backends/imgui_impl_opengl3.h"
 
     #include "Error.hpp"
-
-    #include <cstdio>
-    #include <memory>
 
 struct GLFWwindow;
 
