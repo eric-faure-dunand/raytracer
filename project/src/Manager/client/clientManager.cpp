@@ -7,7 +7,7 @@
 
 namespace raytracer {
 
-ClientManager::ClientManager(const std::string& ip, std::uint16_t port): _ip(ip), _port(port){}
+ClientManager::ClientManager(const std::string& ip, std::uint16_t port): _ip(ip), _port(port) {}
 
 void ClientManager::Advance() {
     if (_stage < COMPUTE)
@@ -235,8 +235,7 @@ void ClientManager::StreamResults(std::vector<std::vector<Tile>>& map) {
     data.Close();
 }
 
-void ClientManager::Update(Scene& scene, const std::array<int, 3> BgCollor)
-{
+void ClientManager::Update(Scene& scene, const std::array<int, 3> BgCollor) {
     DoPoll();
     if (_stage != COMPUTE)
         return;

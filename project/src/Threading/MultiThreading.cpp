@@ -35,8 +35,7 @@ int MultiThread::Compute(
     const std::array<int, 3> BgColor,
     std::size_t start,
     std::size_t max,
-    std::size_t& CalculingRow)
-{
+    std::size_t& CalculingRow) {
     for (auto& t: thread)
         t.get();
     thread.clear();

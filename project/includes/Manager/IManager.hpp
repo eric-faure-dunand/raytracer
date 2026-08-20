@@ -13,9 +13,6 @@ typedef enum {
 
 class Core;
 
-// Selecteur de mode (local / serveur / client). Le rendu CPU historique
-// (Update qui calculait des rangees de pixels) a ete retire : le rendu passe
-// sur GPU. Cette interface sera reetendue quand on branchera le multi.
 class IManager {
 public:
     virtual ~IManager() = default;

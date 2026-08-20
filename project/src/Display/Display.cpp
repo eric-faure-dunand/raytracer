@@ -5,13 +5,11 @@
 
 namespace raytracer {
 
-static void glfw_error_callback(int error, const char *description)
-{
+static void glfw_error_callback(int error, const char *description) {
     std::fprintf(stderr, "GLFW error %d: %s\n", error, description);
 }
 
-static void draw_dockspace()
-{
+static void draw_dockspace() {
     const ImGuiViewport *vp = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(vp->WorkPos);
     ImGui::SetNextWindowSize(vp->WorkSize);
@@ -54,10 +52,7 @@ static void draw_dockspace()
     ImGui::End();
 }
 
-static void draw_panels(Renderer &renderer)
-{
-    // Viewport : on rend la simulation a la taille exacte du panneau, puis on
-    // affiche la texture produite par le GPU.
+static void draw_panels(Renderer &renderer) {
     ImGui::Begin("Viewport");
     ImVec2 avail = ImGui::GetContentRegionAvail();
     int w = static_cast<int>(avail.x);
@@ -65,10 +60,7 @@ static void draw_panels(Renderer &renderer)
     if (w > 0 && h > 0) {
         renderer.resize(w, h);
         renderer.render();
-        // La texture GL a son origine en bas a gauche, ImGui dessine de haut
-        // en bas : on retourne verticalement via uv0=(0,1) / uv1=(1,0).
-        ImGui::Image(static_cast<ImTextureID>(renderer.texture()), avail,
-                     ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image(static_cast<ImTextureID>(renderer.texture()), avail, ImVec2(0, 1), ImVec2(1, 0));
     }
     ImGui::End();
 
@@ -88,13 +80,9 @@ static void draw_panels(Renderer &renderer)
     ImGui::End();
 }
 
-Display::Display(int width, int height, const char *title)
-{
+Display::Display(int width, int height, const char *title) {
     glfwSetErrorCallback(glfw_error_callback);
 #ifdef __linux__
-    // Sous WSLg, le backend Wayland gere mal le maximize (surface GL qui ne
-    // grandit pas d'un coup -> contour noir). X11 (XWayland) le gere bien.
-    // Ignore sur Windows/macOS. A reevaluer pour un Linux Wayland natif.
     glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
 #endif
     if (!glfwInit())
@@ -111,7 +99,7 @@ Display::Display(int width, int height, const char *title)
         throw Error("Display: window creation failed");
     }
     glfwMakeContextCurrent(_window);
-    glfwSwapInterval(1); // vsync
+    glfwSwapInterval(1);
 
     if (!gladLoadGL(glfwGetProcAddress)) {
         glfwDestroyWindow(_window);
@@ -128,14 +116,10 @@ Display::Display(int width, int height, const char *title)
     ImGui_ImplGlfw_InitForOpenGL(_window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
 
-    // Le contexte GL est pret : on peut creer le renderer (il compile son shader).
     _renderer = std::make_unique<Renderer>();
 }
 
-Display::~Display()
-{
-    // Detruire les objets GPU TANT QUE le contexte GL est encore vivant.
-    // (Sinon ~Renderer ferait des appels GL apres glfwTerminate -> segfault.)
+Display::~Display() {
     _renderer.reset();
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -146,13 +130,11 @@ Display::~Display()
     glfwTerminate();
 }
 
-bool Display::isOpen() const
-{
+bool Display::isOpen() const{
     return _window && !glfwWindowShouldClose(_window);
 }
 
-void Display::beginFrame()
-{
+void Display::beginFrame() {
     glfwPollEvents();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -160,13 +142,11 @@ void Display::beginFrame()
     draw_dockspace();
 }
 
-void Display::drawEditor()
-{
+void Display::drawEditor() {
     draw_panels(*_renderer);
 }
 
-void Display::endFrame()
-{
+void Display::endFrame() {
     ImGui::Render();
     int w = 0;
     int h = 0;

@@ -9,8 +9,7 @@
     #include "ILight.hpp"
     #include "Camera.hpp"
 
-namespace raytracer
-{
+namespace raytracer{
 class Scene {
 public:
     std::size_t _x;
@@ -61,6 +60,6 @@ public:
 };
 
 
-} // namespace raytracer
+}
 
 #endif

@@ -1,56 +1,34 @@
 #include "Renderer.hpp"
 
-#include "Error.hpp"
-
-#include <string>
-
 namespace raytracer {
 
-// -----------------------------------------------------------------------------
-// Le compute shader (GLSL).
-//
-// C'est le code execute PAR LE GPU, une fois par pixel, en parallele.
-//   - local_size_x/y = 8 : le GPU traite les pixels par blocs de 8x8 (64
-//     "threads" a la fois). C'est la granularite du travail parallele.
-//   - image2D img (binding = 0) : la texture de sortie, en ecriture.
-//   - gl_GlobalInvocationID.xy : les coordonnees (x,y) du pixel courant.
-//
-// Pour l'instant : chaque pixel recoit du bleu pur (0,0,1,1).
-// Plus tard : a la place de ce bleu, on calculera la couleur du rayon lance
-// depuis la camera a travers ce pixel.
-// -----------------------------------------------------------------------------
 static const char *kComputeSource = R"(#version 430
 layout(local_size_x = 8, local_size_y = 8) in;
 layout(rgba8, binding = 0) uniform image2D img;
 
-void main()
-{
+void main() {
     ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
     ivec2 size = imageSize(img);
 
-    // Les blocs de 8x8 depassent souvent les bords : on ignore le hors-cadre.
     if (pixel.x >= size.x || pixel.y >= size.y)
         return;
 
-    imageStore(img, pixel, vec4(0.0, 0.0, 1.0, 1.0)); // bleu
+    imageStore(img, pixel, vec4(0.0, 0.0, 1.0, 1.0));
 }
 )";
 
-Renderer::Renderer()
-{
+Renderer::Renderer() {
     createProgram();
 }
 
-Renderer::~Renderer()
-{
+Renderer::~Renderer() {
     if (_texture)
         glDeleteTextures(1, &_texture);
     if (_program)
         glDeleteProgram(_program);
 }
 
-void Renderer::createProgram()
-{
+void Renderer::createProgram() {
     // 1) Compiler le compute shader.
     GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
     glShaderSource(shader, 1, &kComputeSource, nullptr);
@@ -79,8 +57,7 @@ void Renderer::createProgram()
     }
 }
 
-void Renderer::allocTexture(int w, int h)
-{
+void Renderer::allocTexture(int w, int h) {
     // Une texture GL est a taille fixe : pour changer de taille on recree.
     if (_texture)
         glDeleteTextures(1, &_texture);
@@ -98,8 +75,7 @@ void Renderer::allocTexture(int w, int h)
     _height = h;
 }
 
-void Renderer::resize(int w, int h)
-{
+void Renderer::resize(int w, int h) {
     if (w <= 0 || h <= 0)
         return;
     if (w == _width && h == _height)
@@ -107,8 +83,7 @@ void Renderer::resize(int w, int h)
     allocTexture(w, h);
 }
 
-void Renderer::render()
-{
+void Renderer::render() {
     if (!_texture)
         return;
 
