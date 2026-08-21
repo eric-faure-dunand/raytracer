@@ -48,11 +48,6 @@ target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
 # Application
 # ---------------------------------------------------------------------------
 file(GLOB_RECURSE PROJECT_SRCS ${CMAKE_SOURCE_DIR}/project/src/*.cpp)
-# Dead CPU-render / networking (removed for now, GPU replaces the renderer).
-list(REMOVE_ITEM PROJECT_SRCS
-    ${CMAKE_SOURCE_DIR}/project/src/Threading/MultiThreading.cpp
-    ${CMAKE_SOURCE_DIR}/project/src/Manager/Net.cpp
-)
 
 add_executable(raytracer ${PROJECT_SRCS})
 
@@ -72,6 +67,7 @@ target_include_directories(raytracer
         project/includes/Manager/client
         project/includes/Manager/server
         project/includes/render
+        project/includes/render/GPULink
         project/includes/security
         ${LIBCONFIG_INCLUDE_DIRS}
         shared
