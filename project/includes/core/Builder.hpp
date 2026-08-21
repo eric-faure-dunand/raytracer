@@ -16,14 +16,12 @@
 namespace raytracer {
 
 class CoreBuilder {
-    raytracer_type _mode = DEFAULT;
     std::string _sceneFile;
     std::string _ip;
     std::uint16_t _port = 0;
     bool _noInit = 0;
 
 public:
-    CoreBuilder& SetMode(raytracer_type mode);
     CoreBuilder& SetSceneFile(const std::string& sceneFile);
     CoreBuilder& SetClientConnection(const std::string& ip, std::uint16_t port);
     CoreBuilder& SetPort(std::uint16_t port);

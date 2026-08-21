@@ -15,12 +15,7 @@ int main(int argc, char **argv) {
         return 0;
     }
     raytracer::CoreBuilder builder;
-    builder.SetMode(arg.GetType()).SetSceneFile(arg.GetSceneFile());
-    /*if (arg.GetType() == raytracer::SERVER)
-        builder.SetPort(static_cast<std::uint16_t>(arg.GetPort()));
-    if (arg.GetType() == raytracer::CLIENT)
-        builder.SetClientConnection(arg.GetIp(), static_cast<std::uint16_t>(arg.GetPort())).SetNoInit(true);*/
-
+    builder.SetSceneFile(arg.GetSceneFile());
     try {
         raytracer::Core core = builder.Build();
         core.Run();
