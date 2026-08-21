@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** args.hpp
-*/
 
 #ifndef ARGS_HPP
     #define ARGS_HPP

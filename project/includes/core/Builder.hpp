@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** Builder.hpp
-*/
 
 #ifndef BUILDER_HPP
     #define BUILDER_HPP

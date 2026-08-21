@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** G-OOP-400-NCE-4-1-raytracer-8
-** File description:
-** CfgReader.cpp
-*/
 
 #include "CfgReader.hpp"
 
@@ -43,7 +37,7 @@ std::pair<std::size_t, std::size_t> CfgReader::GetCameraResolution() {
     return {static_cast<std::size_t>(width), static_cast<std::size_t>(height)};
 }
 
-std::array<int, 3> CfgReader::GetCameraPosition() {
+std::array<float, 3> CfgReader::GetCameraPosition() {
     const libconfig::Setting& root = CameraExist();
     const libconfig::Setting& camera = root["camera"];
     if (!camera.exists("position"))
@@ -53,10 +47,10 @@ std::array<int, 3> CfgReader::GetCameraPosition() {
     int x = 0, y = 0, z = 0;
     if (!position.lookupValue("x", x) || !position.lookupValue("y", y) || !position.lookupValue("z", z))
         throw Error("Core: position are missing in scene file.");
-    return {x, y, z};
+    return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
 }
 
-std::array<int, 3> CfgReader::GetCameraRotation() {
+std::array<float, 3> CfgReader::GetCameraRotation() {
     const libconfig::Setting& root = CameraExist();
     const libconfig::Setting& camera = root["camera"];
     if (!camera.exists("rotation"))
@@ -66,7 +60,7 @@ std::array<int, 3> CfgReader::GetCameraRotation() {
     int x = 0, y = 0, z = 0;
     if (!position.lookupValue("x", x) || !position.lookupValue("y", y) || !position.lookupValue("z", z))
         throw Error("Core: position are missing in scene file.");
-    return {x, y, z};
+    return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
 }
 
 double CfgReader::GetCameraFieldOfView() {

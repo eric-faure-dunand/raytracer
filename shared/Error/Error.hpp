@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** Nano
-** File description:
-** Error.hpp
-*/
 
 #ifndef ERROR_HPP
     #define ERROR_HPP
