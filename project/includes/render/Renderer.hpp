@@ -5,6 +5,8 @@
     #include <string>
 
     #include "Error.hpp"
+    #include "Scene.hpp"
+    #include "Camera.hpp"
 
 namespace raytracer {
 
@@ -14,8 +16,12 @@ class Renderer {
     int _width = 0;
     int _height = 0;
 
+    GPUScene _scene;
+
     void createProgram();
     void allocTexture(int w, int h);
+    void buildDemoScene();
+    void setCameraUniforms(const Camera cam);
 
 public:
     Renderer();
@@ -26,7 +32,7 @@ public:
 
     void resize(int w, int h);
 
-    void render();
+    void render(const Camera cam);
 
     GLuint texture() const { return _texture; }
     int width() const { return _width; }

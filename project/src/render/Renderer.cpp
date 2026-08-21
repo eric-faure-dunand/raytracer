@@ -1,24 +1,11 @@
 #include "Renderer.hpp"
+#include "Shader.hpp"
 
 namespace raytracer {
 
-static const char *kComputeSource = R"(#version 430
-layout(local_size_x = 8, local_size_y = 8) in;
-layout(rgba8, binding = 0) uniform image2D img;
-
-void main() {
-    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
-    ivec2 size = imageSize(img);
-
-    if (pixel.x >= size.x || pixel.y >= size.y)
-        return;
-
-    imageStore(img, pixel, vec4(0.0, 0.0, 1.0, 1.0));
-}
-)";
-
 Renderer::Renderer() {
     createProgram();
+    buildDemoScene();
 }
 
 Renderer::~Renderer() {
@@ -29,44 +16,32 @@ Renderer::~Renderer() {
 }
 
 void Renderer::createProgram() {
-    // 1) Compiler le compute shader.
-    GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
-    glShaderSource(shader, 1, &kComputeSource, nullptr);
-    glCompileShader(shader);
+    _program = Shader::compileCompute("shaders/raytrace.comp");
+}
 
-    GLint ok = 0;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
-    if (!ok) {
-        char log[1024];
-        glGetShaderInfoLog(shader, sizeof(log), nullptr, log);
-        glDeleteShader(shader);
-        throw Error("Renderer: compute shader compilation failed:\n" + std::string(log));
-    }
+void Renderer::buildDemoScene() {
+    uint32_t red  = _scene.addMaterial(GPUMaterial({0.8f, 0.2f, 0.2f, 1.0f}, GPUEffect::Diffuse));
+    uint32_t blue = _scene.addMaterial(GPUMaterial({0.2f, 0.4f, 0.9f, 1.0f}, GPUEffect::Diffuse));
 
-    // 2) Lier le programme.
-    _program = glCreateProgram();
-    glAttachShader(_program, shader);
-    glLinkProgram(_program);
-    glDeleteShader(shader); // le shader compile est copie dans le programme
+    _scene.addSphere(0.0f, 0.0f, -3.0f, 1.0f, red);
+    _scene.addSphere(1.5f, -0.3f, -4.0f, 0.7f, blue);
+}
 
-    glGetProgramiv(_program, GL_LINK_STATUS, &ok);
-    if (!ok) {
-        char log[1024];
-        glGetProgramInfoLog(_program, sizeof(log), nullptr, log);
-        throw Error("Renderer: program link failed:\n" + std::string(log));
-    }
+void Renderer::setCameraUniforms(const Camera cam) {
+    glUniform3f(glGetUniformLocation(_program, "camPos"), cam.position[0] , cam.position[1], cam.position[2]);
+    glUniform3f(glGetUniformLocation(_program, "camForward"), 0.0f, 0.0f, -1.0f);
+    glUniform3f(glGetUniformLocation(_program, "camRight"),1.0f, 0.0f, 0.0f);
+    glUniform3f(glGetUniformLocation(_program, "camUp"),0.0f, 1.0f, 0.0f);
+    glUniform1f(glGetUniformLocation(_program, "tanHalfFov"), 0.5773503f); // tan(30 deg), fov = 60 deg
 }
 
 void Renderer::allocTexture(int w, int h) {
-    // Une texture GL est a taille fixe : pour changer de taille on recree.
     if (_texture)
         glDeleteTextures(1, &_texture);
 
     glGenTextures(1, &_texture);
     glBindTexture(GL_TEXTURE_2D, _texture);
-    // Stockage immuable RGBA 8 bits par canal, 1 niveau de mipmap.
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h);
-    // Filtrage lineaire pour l'affichage a l'ecran.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -83,24 +58,23 @@ void Renderer::resize(int w, int h) {
     allocTexture(w, h);
 }
 
-void Renderer::render() {
+void Renderer::render(const Camera cam) {
     if (!_texture)
         return;
 
     glUseProgram(_program);
 
-    // On expose la texture au shader en tant qu'"image" en ecriture, unite 0
-    // (le meme binding = 0 que dans le GLSL).
+    _scene.upload();
+    _scene.bind(1, 2);
+    setCameraUniforms(cam);
+
     glBindImageTexture(0, _texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    // Nombre de blocs 8x8 necessaires pour couvrir toute l'image (arrondi haut).
     GLuint groupsX = (static_cast<GLuint>(_width) + 7) / 8;
     GLuint groupsY = (static_cast<GLuint>(_height) + 7) / 8;
     glDispatchCompute(groupsX, groupsY, 1);
 
-    // On attend que les ecritures dans la texture soient visibles avant que
-    // quelqu'un (ImGui) ne la lise pour l'afficher.
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 }
