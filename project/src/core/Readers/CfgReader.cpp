@@ -44,10 +44,10 @@ std::array<float, 3> CfgReader::GetCameraPosition() {
         throw Error("Core: missing 'camera.position' section in scene file.");
     const libconfig::Setting& position = camera["position"];
 
-    int x = 0, y = 0, z = 0;
+    float x = 0, y = 0, z = 0;
     if (!position.lookupValue("x", x) || !position.lookupValue("y", y) || !position.lookupValue("z", z))
-        throw Error("Core: position are missing in scene file.");
-    return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
+        throw Error("CfgReader: Camera position are missing or with bad value, in scene file.");
+    return {x, y, z};
 }
 
 std::array<float, 3> CfgReader::GetCameraRotation() {
@@ -57,10 +57,10 @@ std::array<float, 3> CfgReader::GetCameraRotation() {
         throw Error("Core: missing 'camera.rotation' section in scene file.");
     const libconfig::Setting& position = camera["rotation"];
 
-    int x = 0, y = 0, z = 0;
+    float x = 0, y = 0, z = 0;
     if (!position.lookupValue("x", x) || !position.lookupValue("y", y) || !position.lookupValue("z", z))
-        throw Error("Core: position are missing in scene file.");
-    return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
+        throw Error("CfgReader: Camera rotation are missing or with bad value, in scene file.");
+    return {x, y, z};
 }
 
 double CfgReader::GetCameraFieldOfView() {
