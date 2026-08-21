@@ -19,7 +19,6 @@ Core::Core(std::unique_ptr<IReader> reader, std::unique_ptr<IManager> manager, c
 
 void Core::Init() {
     if (_reader) {
-        std::pair<size_t, size_t> size = _reader->GetCameraResolution();
         _reader->GetCameraPosition(),
         _reader->GetCameraRotation(),
         _reader->GetCameraFieldOfView();
