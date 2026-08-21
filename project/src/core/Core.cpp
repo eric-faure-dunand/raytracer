@@ -18,16 +18,11 @@ Core::Core(std::unique_ptr<IReader> reader, std::unique_ptr<IManager> manager, c
 }
 
 void Core::Init() {
-    SceneBuilder builder;
     if (_reader) {
         std::pair<size_t, size_t> size = _reader->GetCameraResolution();
-        builder.add_x(size.first);
-        builder.add_y(size.second);
-        builder.add_camera(render::Camera(
-            _reader->GetCameraPosition(),
-            _reader->GetCameraRotation(),
-            size,
-            _reader->GetCameraFieldOfView()));
+        _reader->GetCameraPosition(),
+        _reader->GetCameraRotation(),
+        _reader->GetCameraFieldOfView();
         try {
             objects = _reader->GetObjects();
             lights = _reader->GetLights();
@@ -36,7 +31,6 @@ void Core::Init() {
                 throw Error("Core : " + static_cast<std::string>(e.what()));
         }
     }
-    _scene = builder.BuildScene();
 }
 
 void Core::SetReader(std::unique_ptr<IReader> reader) {
@@ -77,7 +71,8 @@ void Core::Run() {
     while (display.isOpen()) {
         if (next_time <= std::chrono::steady_clock::now()) {
             display.beginFrame();
-            display.drawEditor();
+            _cam.UpdateVector();
+            display.drawEditor(_cam);
             display.endFrame();
 
             next_time = std::chrono::steady_clock::now() + std::chrono::duration<double>(1.0 / _fps);

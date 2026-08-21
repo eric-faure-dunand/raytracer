@@ -13,7 +13,6 @@
     #include "ILight.hpp"
     #include "Camera.hpp"
     #include "Display.hpp"
-    #include "Scene.hpp"
 
 namespace raytracer {
 
@@ -32,7 +31,7 @@ class Core {
     std::vector<std::unique_ptr<IObject>> objects;
     std::vector<std::unique_ptr<ILight>> lights;
 
-    Scene _scene;
+    Camera _cam;
 
 public:
 
