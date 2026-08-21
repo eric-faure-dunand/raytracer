@@ -32,7 +32,7 @@ void Renderer::setCameraUniforms(const Camera cam) {
     glUniform3f(glGetUniformLocation(_program, "camForward"), 0.0f, 0.0f, -1.0f);
     glUniform3f(glGetUniformLocation(_program, "camRight"),1.0f, 0.0f, 0.0f);
     glUniform3f(glGetUniformLocation(_program, "camUp"),0.0f, 1.0f, 0.0f);
-    glUniform1f(glGetUniformLocation(_program, "tanHalfFov"), 0.5773503f); // tan(30 deg), fov = 60 deg
+    glUniform1f(glGetUniformLocation(_program, "tanHalfFov"), 0.5773503f);
 }
 
 void Renderer::allocTexture(int w, int h) {
