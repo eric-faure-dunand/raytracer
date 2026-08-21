@@ -1,0 +1,101 @@
+#version 430
+
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(rgba8, binding = 0) uniform image2D img;
+
+struct Object {
+    vec4 posRadius;
+    uint type;
+    uint materialIndex;
+    uint _pad0;
+    uint _pad1;
+};
+
+struct Material {
+    vec4 albedo;
+    uint effect;
+    uint textureIndex;
+    float roughness;
+    float _pad0;
+};
+
+layout(std430, binding = 1) readonly buffer Objects   { Object objects[]; };
+layout(std430, binding = 2) readonly buffer Materials { Material materials[]; };
+
+uniform vec3  camPos;
+uniform vec3  camForward;
+uniform vec3  camRight;
+uniform vec3  camUp;
+uniform float tanHalfFov;
+
+const uint SHAPE_SPHERE = 0u;
+
+bool intersectSphere(vec3 ro, vec3 rd, Object obj, out float t) {
+    vec3 center = obj.posRadius.xyz;
+    float radius = obj.posRadius.w;
+
+    vec3 oc = ro - center;
+    float b = dot(oc, rd);
+    float c = dot(oc, oc) - radius * radius;
+    float h = b * b - c;
+
+    if (h < 0.0)
+        return false;
+
+    h = sqrt(h);
+    float t0 = -b - h;
+    float t1 = -b + h;
+
+    t = (t0 > 0.001) ? t0 : t1;
+    return t > 0.001;
+}
+
+void main() {
+    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size  = imageSize(img);
+
+    if (pixel.x >= size.x || pixel.y >= size.y)
+        return;
+
+    vec2 uv = (vec2(pixel) + 0.5) / vec2(size);
+    vec2 ndc = uv * 2.0 - 1.0;
+    float aspect = float(size.x) / float(size.y);
+
+    vec3 rd = normalize(camForward
+        + camRight * (ndc.x * aspect * tanHalfFov)
+        + camUp * (ndc.y * tanHalfFov));
+    vec3 ro = camPos;
+
+    float closestT = 1e30;
+    int hitIndex = -1;
+
+    for (int i = 0; i < objects.length(); i++) {
+        if (objects[i].type != SHAPE_SPHERE)
+            continue;
+
+        float t;
+        if (intersectSphere(ro, rd, objects[i], t) && t < closestT) {
+            closestT = t;
+            hitIndex = i;
+        }
+    }
+
+    vec3 color;
+    if (hitIndex >= 0) {
+        Object obj = objects[hitIndex];
+        Material mat = materials[obj.materialIndex];
+
+        vec3 hitPos = ro + rd * closestT;
+        vec3 normal = normalize(hitPos - obj.posRadius.xyz);
+
+        vec3 lightDir = normalize(vec3(0.5, 0.8, 0.4));
+        float diffuse = max(dot(normal, lightDir), 0.0);
+
+        color = mat.albedo.rgb * (0.15 + 0.85 * diffuse);
+    } else {
+        // Fond en degrade, place ici en attendant un vrai systeme de skybox/lights.
+        color = mix(vec3(0.05, 0.05, 0.08), vec3(0.3, 0.4, 0.6), uv.y);
+    }
+
+    imageStore(img, pixel, vec4(color, 1.0));
+}
