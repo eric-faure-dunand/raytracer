@@ -1,12 +1,9 @@
 #include "Display.hpp"
-#include "Renderer.hpp"
-
-#include <string>
 
 namespace raytracer {
 
 static void glfw_error_callback(int error, const char *description) {
-    std::fprintf(stderr, "GLFW error %d: %s\n", error, description);
+    std::cerr << "GLFW error " << error << ": " << description << std::endl;
 }
 
 static void draw_dockspace() {
@@ -52,14 +49,19 @@ static void draw_dockspace() {
     ImGui::End();
 }
 
-static void draw_panels(Renderer &renderer) {
+static void draw_panels(Renderer &renderer, bool DoUpdate, const Camera cam) {
     ImGui::Begin("Viewport");
     ImVec2 avail = ImGui::GetContentRegionAvail();
     int w = static_cast<int>(avail.x);
     int h = static_cast<int>(avail.y);
     if (w > 0 && h > 0) {
-        renderer.resize(w, h);
-        renderer.render();
+        if (DoUpdate) {
+            std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
+            std::cout << Color::BLUE << "New frame Draw : " << Color::RESET << std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() << std::endl;
+
+            renderer.resize(w, h);
+            renderer.render(cam);
+        }
         ImGui::Image(static_cast<ImTextureID>(renderer.texture()), avail, ImVec2(0, 1), ImVec2(1, 0));
     }
     ImGui::End();
@@ -106,7 +108,7 @@ Display::Display(int width, int height, const char *title) {
         glfwTerminate();
         throw Error("Display: failed to load OpenGL via glad");
     }
-    std::printf("OpenGL %s\n", glGetString(GL_VERSION));
+    std::cout << "OpenGL " << glGetString(GL_VERSION) << std::endl;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -140,10 +142,16 @@ void Display::beginFrame() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     draw_dockspace();
+    ImGui::Begin("Viewport");
+    if (_last_size != ImGui::GetContentRegionAvail())
+        _update = true;
+    _last_size = ImGui::GetContentRegionAvail();
+    ImGui::End();
 }
 
-void Display::drawEditor() {
-    draw_panels(*_renderer);
+void Display::drawEditor(const Camera cam) {
+    draw_panels(*_renderer, _update, cam);
+    _update = false;
 }
 
 void Display::endFrame() {
