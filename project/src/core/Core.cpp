@@ -19,9 +19,9 @@ Core::Core(std::unique_ptr<IReader> reader, std::unique_ptr<IManager> manager, c
 
 void Core::Init() {
     if (_reader) {
-        _reader->GetCameraPosition(),
-        _reader->GetCameraRotation(),
-        _reader->GetCameraFieldOfView();
+        _cam.position =_reader->GetCameraPosition();
+        _cam.rotation = _reader->GetCameraRotation();
+        _cam.fieldOfView = _reader->GetCameraFieldOfView();
         try {
             objects = _reader->GetObjects();
             lights = _reader->GetLights();
