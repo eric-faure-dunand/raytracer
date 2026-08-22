@@ -9,28 +9,20 @@
 
 namespace raytracer {
 
-Core::Core(std::unique_ptr<IReader> reader, const std::string& sceneFile)
-    : _reader(std::move(reader)), _sceneFile(sceneFile) {
+Core::Core(const std::string& sceneFile)
+    : _sceneFile(sceneFile) {
     Init();
 }
 
 void Core::Init() {
-    if (_reader) {
-        _cam.position =_reader->GetCameraPosition();
-        _cam.rotation = _reader->GetCameraRotation();
-        _cam.fieldOfView = _reader->GetCameraFieldOfView();
+    if (!_sceneFile.empty()) {
+        ReaderBuilder builder;
+        auto reader = builder.SetSceneFile(_sceneFile).BuildReader();
+        _cam.position =reader->GetCameraPosition();
+        _cam.rotation = reader->GetCameraRotation();
+        _cam.fieldOfView = reader->GetCameraFieldOfView();
     }
     std::cout << Color::CYAN << "Core ready." << Color::RESET << std::endl;
-}
-
-void Core::SetReader(std::unique_ptr<IReader> reader) {
-    _reader = std::move(reader);
-}
-
-IReader& Core::GetReader() {
-    if (!_reader)
-        throw Warning("Core: reader is not set.");
-    return *_reader;
 }
 
 void Core::Run() {

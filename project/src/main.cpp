@@ -14,9 +14,8 @@ int main(int argc, char **argv) {
         std::cout << e.what();
         return 0;
     }
-    raytracer::ReaderBuilder builder;
     try {
-        raytracer::Core core(builder.SetSceneFile(arg.GetSceneFile()).BuildReader() , arg.GetSceneFile());
+        raytracer::Core core(arg.GetSceneFile());
         core.Run();
     } catch (const IError& e) {
         if (e.code() == 84) {
