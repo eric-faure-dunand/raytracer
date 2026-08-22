@@ -9,11 +9,8 @@
 
 namespace raytracer {
 
-Core::Core(std::unique_ptr<IReader> reader, std::unique_ptr<IManager> manager, const std::string& sceneFile, bool NoInit)
-    : _manager(std::move(manager)), _reader(std::move(reader)), _sceneFile(sceneFile) {
-    _init = NoInit ? false : true;
-    if (NoInit)
-        return;
+Core::Core(std::unique_ptr<IReader> reader, const std::string& sceneFile)
+    : _reader(std::move(reader)), _sceneFile(sceneFile) {
     Init();
 }
 
@@ -30,6 +27,7 @@ void Core::Init() {
                 throw Error("Core : " + static_cast<std::string>(e.what()));
         }
     }
+    std::cout << Color::CYAN << "Core ready." << Color::RESET << std::endl;
 }
 
 void Core::SetReader(std::unique_ptr<IReader> reader) {
@@ -56,14 +54,7 @@ void Core::ReloadObjectsAndLights() {
     }
 }
 
-void Core::MarkInitialized() {
-    _init = true;
-}
-
 void Core::Run() {
-    while (!_init)
-        _manager->InitCore(*this);
-    std::cout << Color::CYAN << "Core ready." << Color::RESET << std::endl;
     auto next_time = std::chrono::steady_clock::now() + std::chrono::duration<double>(1.0 / _fps);
 
     Display display(1280, 720, "Raytracer");
