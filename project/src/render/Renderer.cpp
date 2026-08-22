@@ -1,5 +1,4 @@
 #include "Renderer.hpp"
-#include "Shader.hpp"
 
 namespace raytracer {
 
@@ -27,7 +26,8 @@ void Renderer::buildDemoScene() {
     _scene.addSphere(1.5f, -0.3f, -4.0f, 0.7f, blue);
 }
 
-void Renderer::setCameraUniforms(const Camera cam) {
+void Renderer::setCameraUniforms() {
+    Camera cam = _scene._cam;
     glUniform3f(glGetUniformLocation(_program, "camPos"), cam.position[0] , cam.position[1], cam.position[2]);
     glUniform3f(glGetUniformLocation(_program, "camForward"), cam.rotation[0], cam.rotation[1], cam.rotation[2]);
     glUniform3f(glGetUniformLocation(_program, "camRight"), cam.right[0], cam.right[1], cam.right[2]);
@@ -58,7 +58,7 @@ void Renderer::resize(int w, int h) {
     allocTexture(w, h);
 }
 
-void Renderer::render(const Camera cam) {
+void Renderer::render() {
     if (!_texture)
         return;
 
@@ -66,7 +66,7 @@ void Renderer::render(const Camera cam) {
 
     _scene.upload();
     _scene.bind(1, 2);
-    setCameraUniforms(cam);
+    setCameraUniforms();
 
     glBindImageTexture(0, _texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 

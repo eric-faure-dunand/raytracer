@@ -10,7 +10,7 @@
     #include "Builder.hpp"
     #include "IReader.hpp"
     #include "Camera.hpp"
-    #include "Display.hpp"
+    #include "UI.hpp"
 
 namespace raytracer {
 
@@ -20,13 +20,14 @@ class Core {
     uint8_t _fps = 60;
 
     std::string _sceneFile;
+    std::unique_ptr<Renderer> _renderer;
 
-    Camera _cam;
+    std::unique_ptr<UI> _ui;
 
 public:
 
     Core(const std::string& sceneFile);
-    ~Core() = default;
+    ~Core() {_renderer.reset();};
 
     void Run();
     void Init();

@@ -24,26 +24,26 @@ namespace raytracer {
 
 class Renderer;
 
-class Display {
+class UI {
     GLFWwindow *_window = nullptr;
-    std::unique_ptr<Renderer> _renderer;
 
     ImVec2 _last_size = {0, 0};
 
     bool _update = true;
 
 public:
-    Display(int width, int height, const char *title);
-    ~Display();
+    UI(int width, int height, const char *title);
+    ~UI();
 
-    Display(const Display&) = delete;
-    Display& operator=(const Display&) = delete;
+    UI(const UI&) = delete;
+    UI& operator=(const UI&) = delete;
 
     bool isOpen() const;
 
     void beginFrame();
-    void drawEditor(const Camera cam);
+    void drawEditor(std::unique_ptr<Renderer>& renderer);
     void endFrame();
+    void event();
 };
 
 inline bool operator!=(const ImVec2& first, const ImVec2& second) {

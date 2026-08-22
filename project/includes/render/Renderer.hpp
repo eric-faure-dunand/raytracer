@@ -4,6 +4,7 @@
     #include <glad/gl.h>
     #include <string>
 
+    #include "Shader.hpp"
     #include "Error.hpp"
     #include "Scene.hpp"
     #include "Camera.hpp"
@@ -16,14 +17,15 @@ class Renderer {
     int _width = 0;
     int _height = 0;
 
-    GPUScene _scene;
-
     void createProgram();
     void allocTexture(int w, int h);
     void buildDemoScene();
-    void setCameraUniforms(const Camera cam);
+    void setCameraUniforms();
 
 public:
+
+    GPUScene _scene;
+
     Renderer();
     ~Renderer();
 
@@ -32,7 +34,7 @@ public:
 
     void resize(int w, int h);
 
-    void render(const Camera cam);
+    void render();
 
     GLuint texture() const { return _texture; }
     int width() const { return _width; }

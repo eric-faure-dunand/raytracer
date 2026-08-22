@@ -56,7 +56,7 @@ target_include_directories(raytracer
         project/includes
         project/includes/Error
         project/includes/printer
-        project/includes/Display
+        project/includes/UI
         project/includes/Threading
         project/includes/core
         project/includes/core/scene
@@ -79,6 +79,7 @@ target_compile_options(raytracer
         -Wall
         -Wextra
         -Werror
+        -g3
 )
 
 target_link_libraries(raytracer

@@ -1,4 +1,4 @@
-#include "Display.hpp"
+#include "UI.hpp"
 
 namespace raytracer {
 
@@ -49,7 +49,7 @@ static void draw_dockspace() {
     ImGui::End();
 }
 
-static void draw_panels(Renderer &renderer, bool DoUpdate, const Camera cam) {
+static void draw_panels(Renderer &renderer, bool DoUpdate) {
     ImGui::Begin("Viewport");
     ImVec2 avail = ImGui::GetContentRegionAvail();
     int w = static_cast<int>(avail.x);
@@ -60,7 +60,7 @@ static void draw_panels(Renderer &renderer, bool DoUpdate, const Camera cam) {
             std::cout << Color::BLUE << "New frame Draw : " << Color::RESET << std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() << std::endl;
 
             renderer.resize(w, h);
-            renderer.render(cam);
+            renderer.render();
         }
         ImGui::Image(static_cast<ImTextureID>(renderer.texture()), avail, ImVec2(0, 1), ImVec2(1, 0));
     }
@@ -82,13 +82,13 @@ static void draw_panels(Renderer &renderer, bool DoUpdate, const Camera cam) {
     ImGui::End();
 }
 
-Display::Display(int width, int height, const char *title) {
+UI::UI(int width, int height, const char *title) {
     glfwSetErrorCallback(glfw_error_callback);
 #ifdef __linux__
     glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
 #endif
     if (!glfwInit())
-        throw Error("Display: glfwInit failed");
+        throw Error("UI: glfwInit failed");
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -98,7 +98,7 @@ Display::Display(int width, int height, const char *title) {
     _window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (!_window) {
         glfwTerminate();
-        throw Error("Display: window creation failed");
+        throw Error("UI: window creation failed");
     }
     glfwMakeContextCurrent(_window);
     glfwSwapInterval(1);
@@ -106,7 +106,7 @@ Display::Display(int width, int height, const char *title) {
     if (!gladLoadGL(glfwGetProcAddress)) {
         glfwDestroyWindow(_window);
         glfwTerminate();
-        throw Error("Display: failed to load OpenGL via glad");
+        throw Error("UI: failed to load OpenGL via glad");
     }
     std::cout << "OpenGL " << glGetString(GL_VERSION) << std::endl;
 
@@ -117,13 +117,9 @@ Display::Display(int width, int height, const char *title) {
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(_window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
-
-    _renderer = std::make_unique<Renderer>();
 }
 
-Display::~Display() {
-    _renderer.reset();
-
+UI::~UI() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -132,11 +128,11 @@ Display::~Display() {
     glfwTerminate();
 }
 
-bool Display::isOpen() const{
+bool UI::isOpen() const{
     return _window && !glfwWindowShouldClose(_window);
 }
 
-void Display::beginFrame() {
+void UI::beginFrame() {
     glfwPollEvents();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -149,12 +145,12 @@ void Display::beginFrame() {
     ImGui::End();
 }
 
-void Display::drawEditor(const Camera cam) {
-    draw_panels(*_renderer, _update, cam);
+void UI::drawEditor(std::unique_ptr<Renderer>& renderer) {
+    draw_panels(*renderer, _update);
     _update = false;
 }
 
-void Display::endFrame() {
+void UI::endFrame() {
     ImGui::Render();
     int w = 0;
     int h = 0;
@@ -164,6 +160,10 @@ void Display::endFrame() {
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(_window);
+}
+
+void UI::event() {
+    
 }
 
 }
