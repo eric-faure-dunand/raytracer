@@ -54,6 +54,8 @@ add_executable(raytracer ${PROJECT_SRCS})
 target_include_directories(raytracer
     PRIVATE
         project/includes
+        project/includes/Error
+        project/includes/printer
         project/includes/Display
         project/includes/Threading
         project/includes/core
@@ -70,12 +72,6 @@ target_include_directories(raytracer
         project/includes/render/GPULink
         project/includes/security
         ${LIBCONFIG_INCLUDE_DIRS}
-        shared
-        shared/Light
-        shared/Object
-        shared/Texture
-        shared/Error
-        shared/printer
 )
 
 target_compile_options(raytracer
