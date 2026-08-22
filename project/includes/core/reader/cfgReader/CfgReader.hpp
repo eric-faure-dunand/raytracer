@@ -3,6 +3,7 @@
     #define CFGREADER_HPP
     #include <libconfig.h++>
     #include <algorithm>
+    #include <map>
 
     #include "AReader.hpp"
     #include "Warning.hpp"
@@ -14,10 +15,10 @@ class CfgReader : public AReader {
     libconfig::Config _cfg;
 
     const libconfig::Setting& CameraExist();
-    std::map<std::string, std::string> settingToParams(const libconfig::Setting& cfg, const std::string& prefix = "");
+    //std::map<std::string, std::string> settingToParams(const libconfig::Setting& cfg, const std::string& prefix = "");
     void TakeOneValue(const libconfig::Setting& cfg, std::map<std::string, std::string>& params, const std::string& prefix);
 
-    template<typename T>
+    /*template<typename T>
     std::vector<std::unique_ptr<T>> loadSubList(const std::string& section, const std::string& name_list) {
         std::vector<std::unique_ptr<T>> list;
         const libconfig::Setting& root = _cfg.getRoot();
@@ -61,8 +62,6 @@ class CfgReader : public AReader {
                     try {
                         list.push_back(ldloader.load<T>(GroupeName, param));
                     } catch (const IError& e) {
-                        // If plugin file not found (common when config uses plural names),
-                        // try a singular fallback (e.g., "planes" -> "plane").
                         if (e.code() == 0 && !GroupeName.empty() && GroupeName.back() == 's') {
                             std::string alt = GroupeName.substr(0, GroupeName.size() - 1);
                             try {
@@ -108,7 +107,7 @@ class CfgReader : public AReader {
             }
         }
         return list;
-    }
+    }*/
 
 public:
     CfgReader(std::string NameFile): AReader(NameFile) {SetUp();};
@@ -120,8 +119,8 @@ public:
     std::array<float, 3> GetCameraRotation();
     double GetCameraFieldOfView();
 
-    std::vector<std::unique_ptr<IObject>> GetObjects() { return loadLists<IObject>("primitives"); };
-    std::vector<std::unique_ptr<ILight>> GetLights();
+    //std::vector<std::unique_ptr<IObject>> GetObjects() { return loadLists<IObject>("primitives"); };
+    //std::vector<std::unique_ptr<ILight>> GetLights();
 };
 
 }

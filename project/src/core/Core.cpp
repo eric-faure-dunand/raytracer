@@ -19,13 +19,6 @@ void Core::Init() {
         _cam.position =_reader->GetCameraPosition();
         _cam.rotation = _reader->GetCameraRotation();
         _cam.fieldOfView = _reader->GetCameraFieldOfView();
-        try {
-            objects = _reader->GetObjects();
-            lights = _reader->GetLights();
-        } catch (const IError& e) {
-            if (e.code() == 84)
-                throw Error("Core : " + static_cast<std::string>(e.what()));
-        }
     }
     std::cout << Color::CYAN << "Core ready." << Color::RESET << std::endl;
 }
@@ -38,20 +31,6 @@ IReader& Core::GetReader() {
     if (!_reader)
         throw Warning("Core: reader is not set.");
     return *_reader;
-}
-
-void Core::ReloadObjectsAndLights() {
-    objects.clear();
-    lights.clear();
-    if (!_reader)
-        return;
-    try {
-        objects = _reader->GetObjects();
-        lights = _reader->GetLights();
-    } catch (const IError& e) {
-        if (e.code() == 84)
-            throw Error("Core : " + static_cast<std::string>(e.what()));
-    }
 }
 
 void Core::Run() {

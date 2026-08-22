@@ -8,8 +8,6 @@
     #include <chrono>
 
     #include "IReader.hpp"
-    #include "IObject.hpp"
-    #include "ILight.hpp"
     #include "Camera.hpp"
     #include "Display.hpp"
 
@@ -23,9 +21,6 @@ class Core {
     std::unique_ptr<IReader> _reader;
     std::string _sceneFile;
 
-    std::vector<std::unique_ptr<IObject>> objects;
-    std::vector<std::unique_ptr<ILight>> lights;
-
     Camera _cam;
 
 public:
@@ -37,7 +32,6 @@ public:
     void Init();
     void SetReader(std::unique_ptr<IReader> reader);
     IReader& GetReader();
-    void ReloadObjectsAndLights();
 };
 
 }

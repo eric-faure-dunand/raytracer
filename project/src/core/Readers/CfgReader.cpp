@@ -71,7 +71,7 @@ double CfgReader::GetCameraFieldOfView() {
         throw Error("Core: missing 'camera.fieldOfView' section in scene file.");
     return fov;
 }
-
+/*
 std::vector<std::unique_ptr<ILight>> CfgReader::GetLights() {
     std::vector<std::unique_ptr<ILight>> lights;
 
@@ -99,7 +99,7 @@ std::vector<std::unique_ptr<ILight>> CfgReader::GetLights() {
         }
     }
     return lights;
-}
+}*/
 
 void CfgReader::TakeOneValue(const libconfig::Setting& cfg, std::map<std::string, std::string>& params, const std::string& prefix) {
     switch (cfg.getType()) {
@@ -122,7 +122,7 @@ void CfgReader::TakeOneValue(const libconfig::Setting& cfg, std::map<std::string
             break;
     }
 }
-
+/*
 std::map<std::string, std::string> CfgReader::settingToParams(const libconfig::Setting& cfg, const std::string& prefix) {
     std::map<std::string, std::string> params;
     if (!cfg.isGroup() && !cfg.isArray()) {
@@ -141,6 +141,6 @@ std::map<std::string, std::string> CfgReader::settingToParams(const libconfig::S
         TakeOneValue(field, params, key);
     }
     return params;
-}
+}*/
 
 }
