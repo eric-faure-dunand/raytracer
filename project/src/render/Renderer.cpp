@@ -29,10 +29,10 @@ void Renderer::buildDemoScene() {
 
 void Renderer::setCameraUniforms(const Camera cam) {
     glUniform3f(glGetUniformLocation(_program, "camPos"), cam.position[0] , cam.position[1], cam.position[2]);
-    glUniform3f(glGetUniformLocation(_program, "camForward"), 0.0f, 0.0f, -1.0f);
-    glUniform3f(glGetUniformLocation(_program, "camRight"),1.0f, 0.0f, 0.0f);
-    glUniform3f(glGetUniformLocation(_program, "camUp"),0.0f, 1.0f, 0.0f);
-    glUniform1f(glGetUniformLocation(_program, "tanHalfFov"), 0.5773503f);
+    glUniform3f(glGetUniformLocation(_program, "camForward"), cam.rotation[0], cam.rotation[1], cam.rotation[2]);
+    glUniform3f(glGetUniformLocation(_program, "camRight"), cam.right[0], cam.right[1], cam.right[2]);
+    glUniform3f(glGetUniformLocation(_program, "camUp"), cam.up[0], cam.up[1], cam.up[2]);
+    glUniform1f(glGetUniformLocation(_program, "tanHalfFov"), std::tan((cam.fieldOfView * (M_PI / 180.0)) / 2.0));
 }
 
 void Renderer::allocTexture(int w, int h) {

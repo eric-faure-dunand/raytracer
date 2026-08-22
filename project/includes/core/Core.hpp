@@ -26,7 +26,6 @@ class Core {
     std::unique_ptr<IManager> _manager;
     std::unique_ptr<IReader> _reader;
     std::string _sceneFile;
-    std::array<int, 3> _backgroundColor = {255, 0, 255};
 
     std::vector<std::unique_ptr<IObject>> objects;
     std::vector<std::unique_ptr<ILight>> lights;
