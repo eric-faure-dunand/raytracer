@@ -16,24 +16,24 @@ GPUScene::~GPUScene() {
 
 uint32_t GPUScene::addMaterial(const GPUMaterial &material) {
     _materials.push_back(material);
-    _dirty = true;
+    _change = true;
     return static_cast<uint32_t>(_materials.size() - 1);
 }
 
 uint32_t GPUScene::addSphere(float x, float y, float z, float radius, uint32_t materialIndex) {
     _objects.emplace_back(Vec4f{x, y, z, radius}, GPUShapeType::Sphere, materialIndex);
-    _dirty = true;
+    _change = true;
     return static_cast<uint32_t>(_objects.size() - 1);
 }
 
 void GPUScene::clear() {
     _objects.clear();
     _materials.clear();
-    _dirty = true;
+    _change = true;
 }
 
 void GPUScene::upload() {
-    if (!_dirty)
+    if (!_change)
         return;
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, _objectsSSBO);
@@ -49,7 +49,7 @@ void GPUScene::upload() {
         GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    _dirty = false;
+    _change = false;
 }
 
 void GPUScene::bind(GLuint objectsBinding, GLuint materialsBinding) const {

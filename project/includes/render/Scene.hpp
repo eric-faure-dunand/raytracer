@@ -14,7 +14,7 @@ class GPUScene {
     GLuint _objectsSSBO = 0;
     GLuint _materialsSSBO = 0;
 
-    bool _dirty = true;
+    bool _change = true;
 
 public:
     std::vector<GPUObject> _objects;
