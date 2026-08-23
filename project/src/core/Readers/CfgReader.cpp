@@ -37,7 +37,7 @@ std::pair<std::size_t, std::size_t> CfgReader::GetCameraResolution() {
     return {static_cast<std::size_t>(width), static_cast<std::size_t>(height)};
 }
 
-std::array<float, 3> CfgReader::GetCameraPosition() {
+Vector3 CfgReader::GetCameraPosition() {
     const libconfig::Setting& root = CameraExist();
     const libconfig::Setting& camera = root["camera"];
     if (!camera.exists("position"))
@@ -50,7 +50,7 @@ std::array<float, 3> CfgReader::GetCameraPosition() {
     return {x, y, z};
 }
 
-std::array<float, 3> CfgReader::GetCameraRotation() {
+Vector3 CfgReader::GetCameraRotation() {
     const libconfig::Setting& root = CameraExist();
     const libconfig::Setting& camera = root["camera"];
     if (!camera.exists("rotation"))

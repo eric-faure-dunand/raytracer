@@ -115,8 +115,8 @@ public:
 
     void SetUp();
     std::pair<std::size_t, std::size_t> GetCameraResolution();
-    std::array<float, 3> GetCameraPosition();
-    std::array<float, 3> GetCameraRotation();
+    Vector3 GetCameraPosition();
+    Vector3 GetCameraRotation();
     double GetCameraFieldOfView();
 
     //std::vector<std::unique_ptr<IObject>> GetObjects() { return loadLists<IObject>("primitives"); };

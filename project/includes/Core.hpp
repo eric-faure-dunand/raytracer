@@ -1,12 +1,12 @@
 
 #ifndef CORE_HPP
     #define CORE_HPP
-    #include <array>
     #include <memory>
     #include <string>
     #include <vector>
     #include <chrono>
 
+    #include "MyVector.hpp"
     #include "Builder.hpp"
     #include "IReader.hpp"
     #include "Camera.hpp"

@@ -16,8 +16,8 @@ public:
 
     void SetUp() = 0;
     std::pair<std::size_t, std::size_t> GetCameraResolution() = 0;
-    std::array<float, 3> GetCameraPosition() = 0;
-    std::array<float, 3> GetCameraRotation() = 0;
+    Vector3 GetCameraPosition() = 0;
+    Vector3 GetCameraRotation() = 0;
     double GetCameraFieldOfView() = 0;
 
     //std::vector<std::unique_ptr<IObject>> GetObjects() = 0;

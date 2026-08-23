@@ -3,11 +3,11 @@
     #define ARGS_HPP
     #include <string.h>
     #include <filesystem>
-    #include <array>
     #include <sstream>
     #include <system_error>
     #include <exception>
 
+    #include "MyVector.hpp"
     #include "Error.hpp"
     #include "Warning.hpp"
 
