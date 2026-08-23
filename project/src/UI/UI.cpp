@@ -49,13 +49,13 @@ static void draw_dockspace() {
     ImGui::End();
 }
 
-static void draw_panels(Renderer &renderer, bool DoUpdate) {
+void UI::draw_panels(Renderer &renderer) {
     ImGui::Begin("Viewport");
     ImVec2 avail = ImGui::GetContentRegionAvail();
     int w = static_cast<int>(avail.x);
     int h = static_cast<int>(avail.y);
     if (w > 0 && h > 0) {
-        if (DoUpdate) {
+        if (_update) {
             std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
             std::cout << Color::BLUE << "New frame Draw : " << Color::RESET << std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() << std::endl;
 
@@ -63,6 +63,21 @@ static void draw_panels(Renderer &renderer, bool DoUpdate) {
             renderer.render();
         }
         ImGui::Image(static_cast<ImTextureID>(renderer.texture()), avail, ImVec2(0, 1), ImVec2(1, 0));
+    }
+    if (_showPos) {
+        std::ostringstream stream;
+        stream << renderer._scene._cam.position;
+        std::string text(stream.str());
+        ImVec2 text_size = ImGui::CalcTextSize(text.c_str());
+        float padding = 4.0f;
+
+        ImGui::SetCursorPos(ImVec2(8, 40));
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 0.6f));
+        ImGui::BeginChild("TextBg", ImVec2(text_size.x + padding * 2, text_size.y + padding * 2), false, ImGuiWindowFlags_NoScrollbar);
+        ImGui::SetCursorPos(ImVec2(padding, padding));
+        ImGui::Text("%s", text.c_str());
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
     }
     ImGui::End();
 
@@ -77,8 +92,9 @@ static void draw_panels(Renderer &renderer, bool DoUpdate) {
     ImGui::End();
 
     ImGui::Begin("Inspector");
-    ImGui::TextDisabled("Aucun objet selectionne");
-    ImGui::TextUnformatted("Fond de la scene (placeholder)");
+    ImGui::Checkbox("Show Coordinates", &_showPos);
+    ImGui::SliderFloat("Rotation speed", &RotationSpeed, 0.1f, 5.0f, "%.2f rad/s");
+    ImGui::SliderFloat("Moovement speed", &MoovSpeed, 0.1f, 5.0f, "%.2f rad/s");
     ImGui::End();
 }
 
@@ -146,7 +162,7 @@ void UI::beginFrame() {
 }
 
 void UI::drawEditor(std::unique_ptr<Renderer>& renderer) {
-    draw_panels(*renderer, _update);
+    draw_panels(*renderer);
     _update = false;
 }
 
@@ -163,27 +179,41 @@ void UI::endFrame() {
 }
 
 void UI::event(std::unique_ptr<Renderer>& renderer, uint8_t& fps) {
-    (void)fps;
-    Camera cam = renderer->_scene._cam;
-    std::array<float, 3> MoovVector = {0, 0, 0};
+    Camera &cam = renderer->_scene._cam;
+    Vector3 moveVector = {0, 0, 0};
 
-    if (ImGui::IsKeyDown(ImGuiKey_UpArrow))
-        MoovVector += {cam.rotation[0] * MAXSPEED, cam.rotation[1] * MAXSPEED, cam.rotation[2] * MAXSPEED};
-    if (ImGui::IsKeyDown(ImGuiKey_DownArrow))
-        MoovVector -= {cam.rotation[0] * MAXSPEED, cam.rotation[1] * MAXSPEED, cam.rotation[2] * MAXSPEED};
-    if (ImGui::IsKeyDown(ImGuiKey_RightArrow))
-        MoovVector += cam.right;
-    if (ImGui::IsKeyDown(ImGuiKey_LeftArrow))
-        MoovVector -= cam.right;
+    if (ImGui::IsKeyDown(ImGuiKey_Z))
+        moveVector += {cam.rotation.x * MoovSpeed, cam.rotation.y * MoovSpeed, cam.rotation.z * MoovSpeed};
+    if (ImGui::IsKeyDown(ImGuiKey_S))
+        moveVector -= {cam.rotation.x * MoovSpeed, cam.rotation.y * MoovSpeed, cam.rotation.z * MoovSpeed};
+    if (ImGui::IsKeyDown(ImGuiKey_D))
+        moveVector += {cam.right.x * MoovSpeed, cam.right.y * MoovSpeed, cam.right.z * MoovSpeed};
+    if (ImGui::IsKeyDown(ImGuiKey_Q))
+        moveVector -= {cam.right.x * MoovSpeed, cam.right.y * MoovSpeed, cam.right.z * MoovSpeed};
     if (ImGui::IsKeyDown(ImGuiKey_Space))
-        MoovVector[1] += MAXSPEED;
+        moveVector.y += MoovSpeed;
     if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
-        MoovVector[1] -= MAXSPEED;
+        moveVector.y -= MoovSpeed;
 
-    if (MoovVector[0] != 0.0f || MoovVector[1] != 0.0f || MoovVector[2] != 0.0f)
+    const float dt = (fps > 0) ? 1.0f / static_cast<float>(fps) : 0.0f;
+
+    float deltaYaw = 0.0f;
+    float deltaPitch = 0.0f;
+    if (ImGui::IsKeyDown(ImGuiKey_RightArrow))
+        deltaYaw += RotationSpeed * dt;
+    if (ImGui::IsKeyDown(ImGuiKey_LeftArrow))
+        deltaYaw -= RotationSpeed * dt;
+    if (ImGui::IsKeyDown(ImGuiKey_UpArrow))
+        deltaPitch += RotationSpeed * dt;
+    if (ImGui::IsKeyDown(ImGuiKey_DownArrow))
+        deltaPitch -= RotationSpeed * dt;
+
+    Vector3 oldRotation = cam.rotation;
+    if (deltaYaw != 0.0f || deltaPitch != 0.0f)
+        cam.ApplyYawPitch(deltaYaw, deltaPitch);
+    if (moveVector != Vector3(0.0f, 0.0f, 0.0f) || cam.rotation != oldRotation)
         _update = true;
-    std::cout << " MoovVector : [" << MoovVector[0] << ", " << MoovVector[1] << ", " << MoovVector[2] << "]" << std::endl;
-    renderer->_scene._cam.position += MoovVector;
+    cam.position += moveVector;
 }
 
 }

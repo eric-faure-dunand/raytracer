@@ -8,6 +8,8 @@
     #include <string>
     #include <iostream>
     #include <chrono>
+    #include <cmath>
+    #include <sstream>
 
     #include "imgui.h"
     #include "imgui_internal.h"
@@ -16,8 +18,6 @@
     #include "Renderer.hpp"
     #include "Error.hpp"
     #include "printer.hpp"
-
-    #define MAXSPEED 1.5f
 
 struct GLFWwindow;
 
@@ -31,6 +31,13 @@ class UI {
     ImVec2 _last_size = {0, 0};
 
     bool _update = true;
+
+    bool _showPos = true;
+
+    float MoovSpeed = 1.5f;
+    float RotationSpeed = 1.2f;
+
+    void draw_panels(Renderer &renderer);
 
 public:
     UI(int width, int height, const char *title);
@@ -51,20 +58,6 @@ inline bool operator!=(const ImVec2& first, const ImVec2& second) {
     if (first.x == second.x && first.y == second.y)
         return false;
     return true;
-}
-
-inline std::array<float, 3>& operator-=(std::array<float, 3>& first, const std::array<float, 3>& other) {
-    first[0] -= other[0];
-    first[1] -= other[1];
-    first[2] -= other[2];
-    return first;
-}
-
-inline std::array<float, 3>& operator+=(std::array<float, 3>& first, const std::array<float, 3>& other) {
-    first[0] += other[0];
-    first[1] += other[1];
-    first[2] += other[2];
-    return first;
 }
 
 };
