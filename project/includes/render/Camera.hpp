@@ -1,24 +1,27 @@
 #ifndef CAMERA_HPP
     #define CAMERA_HPP
-
-    #include <array>
     #include <cstddef>
     #include <utility>
     #include <cmath>
+    #include <algorithm>
+
+    #include "MyVector.hpp"
 
 namespace raytracer {
 
 class Camera {
 public:
-    std::array<float, 3> position {0, 0, 0};
-    std::array<float, 3> rotation {0, 0, -1};
-    std::array<float, 3> right {1, 0, 0};
-    std::array<float, 3> up {0, 1, 0};
+    Vector3 position {0, 0, 0};
+    Vector3 rotation {0, 0, -1};
+    Vector3 right {1, 0, 0};
+    Vector3 up {0, 1, 0};
     double fieldOfView = 60.0;
+    float yaw   = -static_cast<float>(M_PI) / 2.0f;
+    float pitch = 0.0f;
 
     Camera() = default;
-    Camera(const std::array<float, 3>& cameraPosition,
-        const std::array<float, 3>& cameraRotation,
+    Camera(const Vector3& cameraPosition,
+        const Vector3& cameraRotation,
         double cameraFieldOfView)
     : position(cameraPosition)
     , rotation(cameraRotation)
@@ -29,28 +32,61 @@ public:
         position = other.position;
         rotation = other.rotation;
         fieldOfView = other.fieldOfView;
+        right = other.right;
+        up = other.up;
+        fieldOfView = other.fieldOfView;
     }
 
     Camera& operator=(const Camera& other) {
         position = other.position;
         rotation = other.rotation;
         fieldOfView = other.fieldOfView;
+        right = other.right;
+        up = other.up;
+        fieldOfView = other.fieldOfView;
         return *this;
     };
 
     void UpdateVector(void) {
-        right[0] = - (rotation[2] * 1.0f);
-        right[1] = 0.0f;
-        right[2] = (rotation[0] * 1.0f);
-        float len = std::sqrt(right[0]*right[0] + right[1]*right[1] + right[2]*right[2]);
-        right[0] /= len;
-        right[1] /= len;
-        right[2] /= len;
+    float rlen = std::sqrt(rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z);
+        if (rlen > 1e-6f) {
+            rotation.x /= rlen;
+            rotation.y /= rlen;
+            rotation.z /= rlen;
+        }
 
-        up[0] = (right[1] * rotation[2]) - (right[2] * rotation[1]);
-        up[1] = (right[2] * rotation[0]) - (right[0] * rotation[2]);
-        up[2] = (right[0] * rotation[1]) - (right[1] * rotation[0]);
+        right.x = (- (rotation.z * 1.0f));
+        right.y = 0.0f;
+        right.z = (rotation.x * 1.0f);
+        float len = std::sqrt(right.x * right.x + right.y * right.y + right.z * right.z);
+        if (len > 1e-6f) {
+            right.x /= len;
+            right.y /= len;
+            right.z /= len;
+        } else
+            right = {1.0f, 0.0f, 0.0f};
+
+        up.x = (right.y * rotation.z) - (right.z * rotation.y);
+        up.y = (right.z * rotation.x) - (right.x * rotation.z);
+        up.z = (right.x * rotation.y) - (right.y * rotation.x);
     };
+
+    void SyncAnglesFromRotation() {
+        pitch = std::asin(std::clamp(rotation.y, -1.0f, 1.0f));
+        yaw   = std::atan2(rotation.z, rotation.x);
+    }
+
+    void ApplyYawPitch(float deltaYaw, float deltaPitch) {
+        constexpr float kMaxPitch = 1.55334f;
+
+        yaw   += deltaYaw;
+        pitch  = std::clamp(pitch + deltaPitch, -kMaxPitch, kMaxPitch);
+
+        rotation.x = std::cos(pitch) * std::cos(yaw);
+        rotation.y = std::sin(pitch);
+        rotation.z = std::cos(pitch) * std::sin(yaw);
+    }
+
 };
 
 }
