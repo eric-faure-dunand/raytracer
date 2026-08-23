@@ -1,6 +1,7 @@
 #ifndef MYVECTOR_HPP
     #define MYVECTOR_HPP
     #include <array>
+    #include <ostream>
 
 namespace raytracer{
 
@@ -18,17 +19,10 @@ public:
         return (other.x == x && other.y == y && other.z == z);
     }
 
-    bool operator==(const std::array<float, 3> arr) {
-        return *this == Vector3(arr);
-    }
-
     bool operator!=(const Vector3 other) {
         return (other.x != x || other.y != y || other.z != z);
     }
 
-    bool operator!=(const std::array<float, 3> arr) {
-        return *this != Vector3(arr);
-    }
 
     Vector3& operator=(const Vector3 other) {
         x = other.x;
@@ -37,19 +31,12 @@ public:
         return *this;
     }
 
-    Vector3& operator=(const std::array<float, 3> arr) {
-        return *this = Vector3(arr);
-    }
 
     Vector3& operator-=(const Vector3& other) {
         x -= other.x;
         y -= other.y;
         z -= other.z;
         return *this;
-    }
-
-    Vector3& operator-=(const std::array<float, 3> arr) {
-        return *this -= Vector3(arr);
     }
 
     Vector3& operator+=(const Vector3& other) {
@@ -59,10 +46,11 @@ public:
         return *this;
     }
 
-    Vector3& operator+=(const std::array<float, 3> arr) {
-        return *this += Vector3(arr);
-    }
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const Vector3& vector) {
+    return stream << "{" << vector.x << ", " << vector.y << ", " << vector.z << "}";
+}
 
 }
 
