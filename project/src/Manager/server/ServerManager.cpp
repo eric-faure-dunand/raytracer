@@ -1,11 +1,5 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer²
-** File description:
-** ServerManager.cpp
-*/
 
-#include "ServerManager.hpp"
+/*#include "ServerManager.hpp"
 
 #include <arpa/inet.h>
 
@@ -235,28 +229,28 @@ void ServerManager::AssignWork() {
     }
 }
 
-void ServerManager::SelfCompute(const std::vector<std::unique_ptr<IObject>>& objects, const std::vector<std::unique_ptr<ILight>>& lights, const render::Camera& camera, std::vector<std::vector<Tile>>& map) {
+void ServerManager::SelfCompute(Scene& scene, const std::array<int, 3> BgCollor) {
     if (_selfComputing) {
         if (!_multiThread.isEnd())
             return;
-        for (std::size_t y = _selfStart; y < _selfEnd && y < map.size(); ++y)
-            for (std::size_t x = 0; x < map[y].size(); ++x)
-                map[y][x].SetState(COMPUTED);
+        for (std::size_t y = _selfStart; y < _selfEnd && y < scene._screen.size(); ++y)
+            for (std::size_t x = 0; x < scene._screen[y].size(); ++x)
+                scene._screen[y][x].SetState(COMPUTED);
         _selfComputing = false;
     }
-    if (_nextRow >= map.size())
+    if (_nextRow >= scene._screen.size())
         return;
     const std::size_t nthreads = static_cast<std::size_t>(_multiThread.GetTreadNumber());
     _selfStart = _nextRow;
-    _selfEnd = std::min(_nextRow + nthreads, map.size());
+    _selfEnd = std::min(_nextRow + nthreads, scene._screen.size());
     _nextRow = _selfEnd;
     _selfComputed = 0;
-    _multiThread.Compute(objects, lights, camera, map, _selfStart, _selfEnd, _selfComputed);
+    _multiThread.Compute(scene, BgCollor, _selfStart, _selfEnd, _selfComputed);
     _selfComputing = true;
 }
 
-void ServerManager::Update(const std::vector<std::unique_ptr<IObject>>& objects, const std::vector<std::unique_ptr<ILight>>& lights, const render::Camera& camera, std::vector<std::vector<Tile>>& map) {
-    _map = &map;
+void ServerManager::Update(Scene& scene, const std::array<int, 3> BgCollor) {
+    _map = &scene._screen;
     DoPoll();
 
     for (auto& cl : _clients) {
@@ -294,12 +288,12 @@ void ServerManager::Update(const std::vector<std::unique_ptr<IObject>>& objects,
     }
 
     AssignWork();
-    SelfCompute(objects, lights, camera, map);
+    SelfCompute(scene, BgCollor);
 
-    if (_nextRow >= map.size() && !_selfComputing && _outstanding == 0) {
+    if (_nextRow >= _map->size() && !_selfComputing && _outstanding == 0) {
         _logger.LogSend("All work done, server finishing.");
         _state = FINISH;
     }
 }
 
-}
+}*/

@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** G-OOP-400-NCE-4-1-raytracer-8
-** File description:
-** CfgReader.cpp
-*/
 
 #include "CfgReader.hpp"
 
@@ -43,29 +37,29 @@ std::pair<std::size_t, std::size_t> CfgReader::GetCameraResolution() {
     return {static_cast<std::size_t>(width), static_cast<std::size_t>(height)};
 }
 
-std::array<int, 3> CfgReader::GetCameraPosition() {
+Vector3 CfgReader::GetCameraPosition() {
     const libconfig::Setting& root = CameraExist();
     const libconfig::Setting& camera = root["camera"];
     if (!camera.exists("position"))
         throw Error("Core: missing 'camera.position' section in scene file.");
     const libconfig::Setting& position = camera["position"];
 
-    int x = 0, y = 0, z = 0;
+    float x = 0, y = 0, z = 0;
     if (!position.lookupValue("x", x) || !position.lookupValue("y", y) || !position.lookupValue("z", z))
-        throw Error("Core: position are missing in scene file.");
+        throw Error("CfgReader: Camera position are missing or with bad value, in scene file.");
     return {x, y, z};
 }
 
-std::array<int, 3> CfgReader::GetCameraRotation() {
+Vector3 CfgReader::GetCameraRotation() {
     const libconfig::Setting& root = CameraExist();
     const libconfig::Setting& camera = root["camera"];
     if (!camera.exists("rotation"))
         throw Error("Core: missing 'camera.rotation' section in scene file.");
     const libconfig::Setting& position = camera["rotation"];
 
-    int x = 0, y = 0, z = 0;
+    float x = 0, y = 0, z = 0;
     if (!position.lookupValue("x", x) || !position.lookupValue("y", y) || !position.lookupValue("z", z))
-        throw Error("Core: position are missing in scene file.");
+        throw Error("CfgReader: Camera rotation are missing or with bad value, in scene file.");
     return {x, y, z};
 }
 
@@ -77,7 +71,7 @@ double CfgReader::GetCameraFieldOfView() {
         throw Error("Core: missing 'camera.fieldOfView' section in scene file.");
     return fov;
 }
-
+/*
 std::vector<std::unique_ptr<ILight>> CfgReader::GetLights() {
     std::vector<std::unique_ptr<ILight>> lights;
 
@@ -105,7 +99,7 @@ std::vector<std::unique_ptr<ILight>> CfgReader::GetLights() {
         }
     }
     return lights;
-}
+}*/
 
 void CfgReader::TakeOneValue(const libconfig::Setting& cfg, std::map<std::string, std::string>& params, const std::string& prefix) {
     switch (cfg.getType()) {
@@ -128,7 +122,7 @@ void CfgReader::TakeOneValue(const libconfig::Setting& cfg, std::map<std::string
             break;
     }
 }
-
+/*
 std::map<std::string, std::string> CfgReader::settingToParams(const libconfig::Setting& cfg, const std::string& prefix) {
     std::map<std::string, std::string> params;
     if (!cfg.isGroup() && !cfg.isArray()) {
@@ -147,6 +141,6 @@ std::map<std::string, std::string> CfgReader::settingToParams(const libconfig::S
         TakeOneValue(field, params, key);
     }
     return params;
-}
+}*/
 
 }

@@ -1,11 +1,5 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** ServerManager.hpp
-*/
 
-#ifndef SERVERMANAGER_HPP
+/*#ifndef SERVERMANAGER_HPP
     #define SERVERMANAGER_HPP
     #include <cstdint>
     #include <sstream>
@@ -57,7 +51,7 @@ class ServerManager : public AManager {
     void Reply(Client& cl, const std::string& message);
     void DoPoll();
     void AssignWork();
-    void SelfCompute(const std::vector<std::unique_ptr<IObject>>& objects, const std::vector<std::unique_ptr<ILight>>& lights, const render::Camera& camera, std::vector<std::vector<Tile>>& map);
+    void SelfCompute(Scene& scene, const std::array<int, 3> BgCollor);
 
     std::size_t GetUid(void);
 public:
@@ -66,9 +60,9 @@ public:
     };
     ~ServerManager() = default;
 
-    void Update(const std::vector<std::unique_ptr<IObject>>& objects, const std::vector<std::unique_ptr<ILight>>& lights, const render::Camera& camera, std::vector<std::vector<Tile>>& map);
+    void Update(Scene& scene, const std::array<int, 3> BgCollor);
 };
 
 }
 
-#endif
+#endif*/

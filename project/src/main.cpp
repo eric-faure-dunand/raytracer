@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** main.cpp
-*/
 
 #include "main.hpp"
 
@@ -20,15 +14,8 @@ int main(int argc, char **argv) {
         std::cout << e.what();
         return 0;
     }
-    raytracer::CoreBuilder builder;
-    builder.SetMode(arg.GetType()).SetSceneFile(arg.GetSceneFile());
-    if (arg.GetType() == raytracer::SERVER)
-        builder.SetPort(static_cast<std::uint16_t>(arg.GetPort()));
-    if (arg.GetType() == raytracer::CLIENT)
-        builder.SetClientConnection(arg.GetIp(), static_cast<std::uint16_t>(arg.GetPort())).SetNoInit(true);
-
     try {
-        raytracer::Core core = builder.Build();
+        raytracer::Core core(arg.GetSceneFile());
         core.Run();
     } catch (const IError& e) {
         if (e.code() == 84) {

@@ -1,11 +1,5 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** clientManager.cpp
-*/
 
-#include "ClientManager.hpp"
+/*#include "ClientManager.hpp"
 #include "CfgReader.hpp"
 
 #include <arpa/inet.h>
@@ -13,7 +7,7 @@
 
 namespace raytracer {
 
-ClientManager::ClientManager(const std::string& ip, std::uint16_t port): _ip(ip), _port(port){}
+ClientManager::ClientManager(const std::string& ip, std::uint16_t port): _ip(ip), _port(port) {}
 
 void ClientManager::Advance() {
     if (_stage < COMPUTE)
@@ -241,8 +235,7 @@ void ClientManager::StreamResults(std::vector<std::vector<Tile>>& map) {
     data.Close();
 }
 
-void ClientManager::Update(const std::vector<std::unique_ptr<IObject>>& objects, const std::vector<std::unique_ptr<ILight>>& lights, const render::Camera& camera, std::vector<std::vector<Tile>>& map)
-{
+void ClientManager::Update(Scene& scene, const std::array<int, 3> BgCollor) {
     DoPoll();
     if (_stage != COMPUTE)
         return;
@@ -266,7 +259,7 @@ void ClientManager::Update(const std::vector<std::unique_ptr<IObject>>& objects,
             return;
         }
         Computed = 0;
-        _multiThread.Compute(objects, lights, camera, map, start, end, Computed);
+        _multiThread.Compute(scene, BgCollor, start, end, Computed);
         _state = WORKING;
         return;
     }
@@ -274,7 +267,7 @@ void ClientManager::Update(const std::vector<std::unique_ptr<IObject>>& objects,
         if (!_multiThread.isEnd())
             return;
         try {
-            StreamResults(map);
+            StreamResults(scene._screen);
         } catch (const IError& e) {
             std::cerr << "Client: FPUT failed: " << e.what() << "\n";
         }
@@ -292,4 +285,4 @@ void ClientManager::InitCore(Core& core) {
     ProcessActiveStates(core);
 }
 
-}
+}*/

@@ -1,86 +1,47 @@
-/*
-** EPITECH PROJECT, 2025
-** raytracer
-** File description:
-** Core.cpp
-*/
 
 #include "Core.hpp"
 
+#include <iostream>
+
+#include "Error.hpp"
+#include "Warning.hpp"
+#include "printer.hpp"
+
 namespace raytracer {
 
-Core::Core(std::unique_ptr<IReader> reader, std::unique_ptr<IManager> manager, const std::string& sceneFile, bool NoInit)
-    : _x(0), _y(0), _manager(std::move(manager)), _reader(std::move(reader)), _sceneFile(sceneFile) {
-    _init = NoInit ? false : true;
-    if (NoInit)
-        return;
-    this->Init();
+Core::Core(const std::string& sceneFile)
+    : _sceneFile(sceneFile) {
+    Init();
 }
 
 void Core::Init() {
-    if (_reader) {
-        std::pair<size_t, size_t> size = _reader->GetCameraResolution();
-        _x = size.first;
-        _y = size.second;
-        _camera = render::Camera(
-            _reader->GetCameraPosition(),
-            _reader->GetCameraRotation(),
-            size,
-            _reader->GetCameraFieldOfView());
+    _ui = std::make_unique<UI>(1280, 720, "Raytracer");
+    _renderer = std::make_unique<Renderer>();
+    if (!_sceneFile.empty()) {
+        ReaderBuilder builder;
+        auto reader = builder.SetSceneFile(_sceneFile).BuildReader();
+        _renderer->_scene._cam.position = reader->GetCameraPosition();
+        _renderer->_scene._cam.rotation = reader->GetCameraRotation();
+        _renderer->_scene._cam.fieldOfView = reader->GetCameraFieldOfView();
+        _renderer->_scene._cam.SyncAnglesFromRotation();
     }
-    map.resize(_y);
-    for (auto& row : map)
-        row.assign(_x, Tile({0, 0, 0}));
-    sfml.emplace(_x, _y);
-    try {
-        Objects = _reader->GetObjects();
-        Lights  = _reader->GetLights();
-    } catch (const IError& e) {
-        if (e.code() == 84)
-            throw Error("Core : " + static_cast<std::string>(e.what()));
-    }
-}
-
-void Core::SetReader(std::unique_ptr<IReader> reader) {
-    _reader = std::move(reader);
-}
-
-IReader& Core::GetReader() {
-    if (!_reader)
-        throw Warning("Core: reader is not set.");
-    return *_reader;
-}
-
-void Core::ReloadObjectsAndLights() {
-    Objects.clear();
-    Lights.clear();
-    if (!_reader)
-        return;
-    try {
-        Objects = _reader->GetObjects();
-        Lights = _reader->GetLights();
-    } catch (const IError& e) {
-        if (e.code() == 84)
-            throw Error("Core : " + static_cast<std::string>(e.what()));
-    }
-}
-
-void Core::MarkInitialized() {
-    _init = true;
+    std::cout << Color::CYAN << "Core ready." << Color::RESET << std::endl;
 }
 
 void Core::Run() {
-    while (!_init)
-        _manager->InitCore(*this);
-    std::cout << Color::CYAN << "Core ready." << Color::RESET << std::endl;
-    while (sfml->isOpen()) {
-        if (!sfml->pollEvents())
-            break;
-        _manager->Update(Objects, Lights, _camera, map);
-        sfml->render(map);
+    auto next_time = std::chrono::steady_clock::now() + std::chrono::duration<double>(1.0 / _fps);
+
+    while (_ui->isOpen()) {
+        if (next_time <= std::chrono::steady_clock::now()) {
+            _ui->beginFrame();
+            _ui->event(_renderer, _fps);
+            _renderer->_scene._cam.UpdateVector();
+            _ui->drawEditor(_renderer);
+            _ui->endFrame();
+
+            next_time = std::chrono::steady_clock::now() + std::chrono::duration<double>(1.0 / _fps);
+        }
     }
-    if (!_sceneFile.empty())
-        ppmconvertor.Draw(_sceneFile.substr(0, _sceneFile.rfind('.')) + ".ppm", map);
 }
 
 }
