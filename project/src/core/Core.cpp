@@ -23,6 +23,7 @@ void Core::Init() {
         _renderer->_scene._cam.position = reader->GetCameraPosition();
         _renderer->_scene._cam.rotation = reader->GetCameraRotation();
         _renderer->_scene._cam.fieldOfView = reader->GetCameraFieldOfView();
+        _renderer->_scene._cam.SyncAnglesFromRotation();
     }
     std::cout << Color::CYAN << "Core ready." << Color::RESET << std::endl;
 }
@@ -33,10 +34,10 @@ void Core::Run() {
     while (_ui->isOpen()) {
         if (next_time <= std::chrono::steady_clock::now()) {
             _ui->beginFrame();
+            _ui->event(_renderer, _fps);
             _renderer->_scene._cam.UpdateVector();
             _ui->drawEditor(_renderer);
             _ui->endFrame();
-            _ui->event(_renderer, _fps);
 
             next_time = std::chrono::steady_clock::now() + std::chrono::duration<double>(1.0 / _fps);
         }
