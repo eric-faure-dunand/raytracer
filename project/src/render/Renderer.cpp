@@ -28,10 +28,10 @@ void Renderer::buildDemoScene() {
 
 void Renderer::setCameraUniforms() {
     Camera cam = _scene._cam;
-    glUniform3f(glGetUniformLocation(_program, "camPos"), cam.position[0] , cam.position[1], cam.position[2]);
-    glUniform3f(glGetUniformLocation(_program, "camForward"), cam.rotation[0], cam.rotation[1], cam.rotation[2]);
-    glUniform3f(glGetUniformLocation(_program, "camRight"), cam.right[0], cam.right[1], cam.right[2]);
-    glUniform3f(glGetUniformLocation(_program, "camUp"), cam.up[0], cam.up[1], cam.up[2]);
+    glUniform3f(glGetUniformLocation(_program, "camPos"), cam.position.x , cam.position.y, cam.position.z);
+    glUniform3f(glGetUniformLocation(_program, "camForward"), cam.rotation.x, cam.rotation.y, cam.rotation.z);
+    glUniform3f(glGetUniformLocation(_program, "camRight"), cam.right.x, cam.right.y, cam.right.z);
+    glUniform3f(glGetUniformLocation(_program, "camUp"), cam.up.x, cam.up.y, cam.up.z);
     glUniform1f(glGetUniformLocation(_program, "tanHalfFov"), std::tan((cam.fieldOfView * (M_PI / 180.0)) / 2.0));
 }
 
