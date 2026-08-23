@@ -14,9 +14,10 @@
     #include "backends/imgui_impl_glfw.h"
     #include "backends/imgui_impl_opengl3.h"
     #include "Renderer.hpp"
-
     #include "Error.hpp"
     #include "printer.hpp"
+
+    #define MAXSPEED 1.5f
 
 struct GLFWwindow;
 
@@ -43,7 +44,7 @@ public:
     void beginFrame();
     void drawEditor(std::unique_ptr<Renderer>& renderer);
     void endFrame();
-    void event();
+    void event(std::unique_ptr<Renderer>& renderer, uint8_t& _fps);
 };
 
 inline bool operator!=(const ImVec2& first, const ImVec2& second) {
@@ -52,6 +53,20 @@ inline bool operator!=(const ImVec2& first, const ImVec2& second) {
     return true;
 }
 
+inline std::array<float, 3>& operator-=(std::array<float, 3>& first, const std::array<float, 3>& other) {
+    first[0] -= other[0];
+    first[1] -= other[1];
+    first[2] -= other[2];
+    return first;
 }
+
+inline std::array<float, 3>& operator+=(std::array<float, 3>& first, const std::array<float, 3>& other) {
+    first[0] += other[0];
+    first[1] += other[1];
+    first[2] += other[2];
+    return first;
+}
+
+};
 
 #endif

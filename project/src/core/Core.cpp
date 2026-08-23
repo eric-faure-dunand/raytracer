@@ -36,7 +36,7 @@ void Core::Run() {
             _renderer->_scene._cam.UpdateVector();
             _ui->drawEditor(_renderer);
             _ui->endFrame();
-            _ui->event();
+            _ui->event(_renderer, _fps);
 
             next_time = std::chrono::steady_clock::now() + std::chrono::duration<double>(1.0 / _fps);
         }

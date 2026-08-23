@@ -162,8 +162,28 @@ void UI::endFrame() {
     glfwSwapBuffers(_window);
 }
 
-void UI::event() {
-    
+void UI::event(std::unique_ptr<Renderer>& renderer, uint8_t& fps) {
+    (void)fps;
+    Camera cam = renderer->_scene._cam;
+    std::array<float, 3> MoovVector = {0, 0, 0};
+
+    if (ImGui::IsKeyDown(ImGuiKey_UpArrow))
+        MoovVector += {cam.rotation[0] * MAXSPEED, cam.rotation[1] * MAXSPEED, cam.rotation[2] * MAXSPEED};
+    if (ImGui::IsKeyDown(ImGuiKey_DownArrow))
+        MoovVector -= {cam.rotation[0] * MAXSPEED, cam.rotation[1] * MAXSPEED, cam.rotation[2] * MAXSPEED};
+    if (ImGui::IsKeyDown(ImGuiKey_RightArrow))
+        MoovVector += cam.right;
+    if (ImGui::IsKeyDown(ImGuiKey_LeftArrow))
+        MoovVector -= cam.right;
+    if (ImGui::IsKeyDown(ImGuiKey_Space))
+        MoovVector[1] += MAXSPEED;
+    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+        MoovVector[1] -= MAXSPEED;
+
+    if (MoovVector[0] != 0.0f || MoovVector[1] != 0.0f || MoovVector[2] != 0.0f)
+        _update = true;
+    std::cout << " MoovVector : [" << MoovVector[0] << ", " << MoovVector[1] << ", " << MoovVector[2] << "]" << std::endl;
+    renderer->_scene._cam.position += MoovVector;
 }
 
 }
