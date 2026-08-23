@@ -54,6 +54,7 @@ add_executable(raytracer ${PROJECT_SRCS})
 target_include_directories(raytracer
     PRIVATE
         project/includes
+        project/includes/Tools
         project/includes/Error
         project/includes/printer
         project/includes/UI
