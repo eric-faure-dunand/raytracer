@@ -27,6 +27,7 @@ public:
     GPUScene _scene;
 
     Renderer();
+    Renderer(bool demo);
     ~Renderer();
 
     Renderer(const Renderer&) = delete;

@@ -33,6 +33,7 @@ class UI {
     bool _update = true;
 
     bool _showPos = true;
+    bool _showAngle = false;
 
     float MoovSpeed = 1.5f;
     float RotationSpeed = 1.2f;

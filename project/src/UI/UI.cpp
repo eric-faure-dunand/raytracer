@@ -6,6 +6,19 @@ static void glfw_error_callback(int error, const char *description) {
     std::cerr << "GLFW error " << error << ": " << description << std::endl;
 }
 
+static void DrawText(const char *text, int x, int y) {
+    ImVec2 text_size = ImGui::CalcTextSize(text);
+    float padding = 4.0f;
+
+    ImGui::SetCursorPos(ImVec2(x, y));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 0.6f));
+    ImGui::BeginChild(text, ImVec2(text_size.x + padding * 2, text_size.y + padding * 2), false, ImGuiWindowFlags_NoScrollbar);
+    ImGui::SetCursorPos(ImVec2(padding, padding));
+    ImGui::Text("%s", text);
+    ImGui::EndChild();
+    ImGui::PopStyleColor();
+}
+
 static void draw_dockspace() {
     const ImGuiViewport *vp = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(vp->WorkPos);
@@ -56,9 +69,6 @@ void UI::draw_panels(Renderer &renderer) {
     int h = static_cast<int>(avail.y);
     if (w > 0 && h > 0) {
         if (_update) {
-            std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
-            std::cout << Color::BLUE << "New frame Draw : " << Color::RESET << std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() << std::endl;
-
             renderer.resize(w, h);
             renderer.render();
         }
@@ -68,16 +78,13 @@ void UI::draw_panels(Renderer &renderer) {
         std::ostringstream stream;
         stream << renderer._scene._cam.position;
         std::string text(stream.str());
-        ImVec2 text_size = ImGui::CalcTextSize(text.c_str());
-        float padding = 4.0f;
-
-        ImGui::SetCursorPos(ImVec2(8, 40));
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 0.6f));
-        ImGui::BeginChild("TextBg", ImVec2(text_size.x + padding * 2, text_size.y + padding * 2), false, ImGuiWindowFlags_NoScrollbar);
-        ImGui::SetCursorPos(ImVec2(padding, padding));
-        ImGui::Text("%s", text.c_str());
-        ImGui::EndChild();
-        ImGui::PopStyleColor();
+        DrawText(text.c_str(), 8, 40);
+    }
+    if (_showAngle) {
+        std::ostringstream stream;
+        stream << renderer._scene._cam.rotation;
+        std::string text(stream.str());
+        DrawText(text.c_str(), 8, 60);
     }
     ImGui::End();
 
@@ -92,7 +99,8 @@ void UI::draw_panels(Renderer &renderer) {
     ImGui::End();
 
     ImGui::Begin("Inspector");
-    ImGui::Checkbox("Show Coordinates", &_showPos);
+    ImGui::Checkbox("Show coordinates", &_showPos);
+    ImGui::Checkbox("Show direction View", &_showAngle);
     ImGui::SliderFloat("Rotation speed", &RotationSpeed, 0.1f, 5.0f, "%.2f rad/s");
     ImGui::SliderFloat("Moovement speed", &MoovSpeed, 0.1f, 5.0f, "%.2f rad/s");
     ImGui::End();

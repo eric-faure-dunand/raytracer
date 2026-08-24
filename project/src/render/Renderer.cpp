@@ -7,6 +7,12 @@ Renderer::Renderer() {
     buildDemoScene();
 }
 
+Renderer::Renderer(bool demo) {
+    createProgram();
+    if (demo)
+        buildDemoScene();
+}
+
 Renderer::~Renderer() {
     if (_texture)
         glDeleteTextures(1, &_texture);
