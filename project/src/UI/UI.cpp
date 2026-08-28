@@ -90,7 +90,7 @@ void UI::draw_panels(Renderer &renderer) {
 
     ImGui::Begin("Hierarchy");
     ImGuiStyle& style = ImGui::GetStyle();
-    float button_size = 32.0f;
+    float button_size = 60.0f;
     float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
     int NbObject = renderer._scene._objects.size();
 
@@ -100,12 +100,10 @@ void UI::draw_panels(Renderer &renderer) {
         bool selected = (selected_index == i);
         if (selected)
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.26f, 0.59f, 0.98f, 1.0f));
-
         if (static_cast<int>(ObjectTrombi.size()) <= i)
-            ObjectTrombi.push_back(TrombiRender->GetObjectTrombi(renderer._scene._objects[i], renderer._scene._materials[i], ImVec2(button_size, button_size)));
-        if (ImGui::ImageButton("obj_btn", ObjectTrombi[i], ImVec2(button_size, button_size)))
+            ObjectTrombi.push_back(static_cast<ImTextureID>(TrombiRender->GetObjectTrombi(renderer._scene._objects[i], renderer._scene._materials[i], ImVec2(button_size, button_size))));
+        if (ImGui::ImageButton(std::format("object {}", i).c_str(), ObjectTrombi[i], ImVec2(button_size, button_size)))
             selected_index = i;
-
         if (selected)
             ImGui::PopStyleColor();
 
@@ -253,7 +251,7 @@ void UI::event(std::unique_ptr<Renderer>& renderer, uint8_t& fps) {
     cam.position += moveVector;
 }
 
-ImTextureID LittelRender::GetObjectTrombi(const GPUObject Object, const GPUMaterial Material, const ImVec2 ImageSize) {
+GLuint LittelRender::GetObjectTrombi(const GPUObject Object, const GPUMaterial Material, const ImVec2 ImageSize) {
     render.resize(ImageSize.x, ImageSize.y);
     render._scene._materials.clear();
     render._scene._objects.clear();
@@ -264,11 +262,28 @@ ImTextureID LittelRender::GetObjectTrombi(const GPUObject Object, const GPUMater
     normalizedObject.posRadius.z = 0.0;
     normalizedObject.materialIndex = render._scene.addMaterial(Material);
 
-
-    render._scene._cam.position = {0.0, 0.0, 3.0};
     render._scene.addObject(normalizedObject);
 
-    return static_cast<ImTextureID>(render.texture());
+    float radius = Object.posRadius.w;
+    render._scene._cam.position = {0.0f, 0.0f, radius * 2.5f};
+    render._scene._cam.rotation = {0.0f, 0.0f, -1.0f};
+    render._scene._cam.UpdateVector();
+    render.render();
+
+    GLuint thumbnail = 0;
+    glGenTextures(1, &thumbnail);
+    glBindTexture(GL_TEXTURE_2D, thumbnail);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, ImageSize.x, ImageSize.y);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glCopyImageSubData(
+        render.texture(), GL_TEXTURE_2D, 0, 0, 0, 0,
+        thumbnail,        GL_TEXTURE_2D, 0, 0, 0, 0,
+        ImageSize.x, ImageSize.y, 1);
+
+    return thumbnail;
 }
 
 }

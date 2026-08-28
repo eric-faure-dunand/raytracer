@@ -80,7 +80,7 @@ target_compile_options(raytracer
         -Wall
         -Wextra
         -Werror
-        -g3
+        -std=c++20
 )
 
 target_link_libraries(raytracer

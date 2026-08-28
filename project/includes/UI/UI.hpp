@@ -11,6 +11,7 @@
     #include <cmath>
     #include <sstream>
     #include <optional>
+    #include <format>
 
     #include "imgui.h"
     #include "imgui_internal.h"
@@ -32,7 +33,7 @@ public:
     LittelRender() : render(false) {};
     ~LittelRender() = default;
 
-    ImTextureID GetObjectTrombi(const GPUObject Object, const GPUMaterial Material, const ImVec2 ImageSize);
+    GLuint GetObjectTrombi(const GPUObject Object, const GPUMaterial Material, const ImVec2 ImageSize);
 };
 
 class UI {
