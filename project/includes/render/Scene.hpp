@@ -28,6 +28,7 @@ public:
     GPUScene& operator=(const GPUScene&) = delete;
 
     uint32_t addMaterial(const GPUMaterial &material);
+    uint32_t addObject(const GPUObject &object);
     uint32_t addSphere(float x, float y, float z, float radius, uint32_t materialIndex);
 
     void clear();

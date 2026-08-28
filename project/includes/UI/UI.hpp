@@ -10,6 +10,7 @@
     #include <chrono>
     #include <cmath>
     #include <sstream>
+    #include <optional>
 
     #include "imgui.h"
     #include "imgui_internal.h"
@@ -25,6 +26,15 @@ namespace raytracer {
 
 class Renderer;
 
+class LittelRender {
+    Renderer render;
+public:
+    LittelRender() : render(false) {};
+    ~LittelRender() = default;
+
+    ImTextureID GetObjectTrombi(const GPUObject Object, const GPUMaterial Material, const ImVec2 ImageSize);
+};
+
 class UI {
     GLFWwindow *_window = nullptr;
 
@@ -37,6 +47,10 @@ class UI {
 
     float MoovSpeed = 1.5f;
     float RotationSpeed = 1.2f;
+
+    std::optional<LittelRender> TrombiRender;
+    std::vector<ImTextureID> ObjectTrombi;
+    int selected_index = -1;
 
     void draw_panels(Renderer &renderer);
 

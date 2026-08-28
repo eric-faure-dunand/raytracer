@@ -20,6 +20,12 @@ uint32_t GPUScene::addMaterial(const GPUMaterial &material) {
     return static_cast<uint32_t>(_materials.size() - 1);
 }
 
+uint32_t GPUScene::addObject(const GPUObject &object) {
+    _objects.push_back(object);
+    _change = true;
+    return static_cast<uint32_t>(_objects.size() - 1);
+}
+
 uint32_t GPUScene::addSphere(float x, float y, float z, float radius, uint32_t materialIndex) {
     _objects.emplace_back(Vec4f{x, y, z, radius}, GPUShapeType::Sphere, materialIndex);
     _change = true;

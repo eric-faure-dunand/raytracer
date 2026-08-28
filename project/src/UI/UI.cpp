@@ -89,7 +89,33 @@ void UI::draw_panels(Renderer &renderer) {
     ImGui::End();
 
     ImGui::Begin("Hierarchy");
-    ImGui::TextDisabled("Objets de la scene (vide)");
+    ImGuiStyle& style = ImGui::GetStyle();
+    float button_size = 32.0f;
+    float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+    int NbObject = renderer._scene._objects.size();
+
+    for (int i = 0; i < NbObject; i++) {
+        ImGui::PushID(i);
+
+        bool selected = (selected_index == i);
+        if (selected)
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.26f, 0.59f, 0.98f, 1.0f));
+
+        if (static_cast<int>(ObjectTrombi.size()) <= i)
+            ObjectTrombi.push_back(TrombiRender->GetObjectTrombi(renderer._scene._objects[i], renderer._scene._materials[i], ImVec2(button_size, button_size)));
+        if (ImGui::ImageButton("obj_btn", ObjectTrombi[i], ImVec2(button_size, button_size)))
+            selected_index = i;
+
+        if (selected)
+            ImGui::PopStyleColor();
+
+        float last_button_x2 = ImGui::GetItemRectMax().x;
+        float next_button_x2 = last_button_x2 + style.ItemSpacing.x + button_size;
+        if (i + 1 < NbObject && next_button_x2 < window_visible_x2)
+            ImGui::SameLine();
+
+        ImGui::PopID();
+    }
     ImGui::End();
 
     ImGui::Begin("Add Object");
@@ -141,9 +167,12 @@ UI::UI(int width, int height, const char *title) {
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(_window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
+    TrombiRender.emplace();
 }
 
 UI::~UI() {
+    TrombiRender.reset();
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -222,6 +251,24 @@ void UI::event(std::unique_ptr<Renderer>& renderer, uint8_t& fps) {
     if (moveVector != Vector3(0.0f, 0.0f, 0.0f) || cam.rotation != oldRotation)
         _update = true;
     cam.position += moveVector;
+}
+
+ImTextureID LittelRender::GetObjectTrombi(const GPUObject Object, const GPUMaterial Material, const ImVec2 ImageSize) {
+    render.resize(ImageSize.x, ImageSize.y);
+    render._scene._materials.clear();
+    render._scene._objects.clear();
+
+    GPUObject normalizedObject = Object;
+    normalizedObject.posRadius.x = 0.0;
+    normalizedObject.posRadius.y = 0.0;
+    normalizedObject.posRadius.z = 0.0;
+    normalizedObject.materialIndex = render._scene.addMaterial(Material);
+
+
+    render._scene._cam.position = {0.0, 0.0, 3.0};
+    render._scene.addObject(normalizedObject);
+
+    return static_cast<ImTextureID>(render.texture());
 }
 
 }
