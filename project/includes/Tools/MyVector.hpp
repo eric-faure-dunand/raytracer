@@ -2,6 +2,7 @@
     #define MYVECTOR_HPP
     #include <array>
     #include <ostream>
+    #include <format>
 
 namespace raytracer{
 
@@ -49,7 +50,7 @@ public:
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const Vector3& vector) {
-    return stream << "{" << vector.x << ", " << vector.y << ", " << vector.z << "}";
+    return stream << "{" << std::format("{:.2f}, {:.2f}, {:.2f}", vector.x, vector.y, vector.z) << "}";
 }
 
 }
